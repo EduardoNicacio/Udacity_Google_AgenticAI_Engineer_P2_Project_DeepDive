@@ -2,7 +2,6 @@
 
 A hands-on project demonstrating **agentic AI workflow patterns** using **Google's Agent Development Kit (ADK)**.
 
-
 ## Testing Your Implementation
 
 ### Run the Complete Workflow
