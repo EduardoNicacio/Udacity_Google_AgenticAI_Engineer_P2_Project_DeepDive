@@ -18,7 +18,7 @@ class FactCheckAgent(LlmAgent):
     Pattern: LlmAgent for validation tasks
     """
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize the fact check agent.
 
         Args:
@@ -69,6 +69,6 @@ Be rigorous but acknowledge the limits of knowledge-based verification."""
             generate_content_config=GenerateContentConfig(
                 temperature=0.2,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )

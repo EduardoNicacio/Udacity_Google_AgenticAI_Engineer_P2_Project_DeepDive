@@ -9,7 +9,7 @@ from google.genai.types import GenerateContentConfig
 class WebSearchAgent(LlmAgent):
     """Simulates web search using LLM (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         instruction = """You are a web search specialist that finds relevant online sources.
 
 Generate 5-10 realistic web search results with:
@@ -34,7 +34,7 @@ Output format (JSON):
   "search_time": 0.5
 }"""
 
-        # Initialize ADK LlmAgent 
+        # Initialize ADK LlmAgent
         super().__init__(
             name="web_search",
             model=model,
@@ -42,8 +42,8 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.8,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
     def search(self, client: genai.Client, query: str) -> Dict[str, Any]:
@@ -51,33 +51,31 @@ Output format (JSON):
         prompt = f"{self.instruction}\n\nuser: Search query: {query}\n\nGenerate realistic web search results for this query."
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'source_type': 'web',
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "source_type": "web",
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'source_type': 'web',
-                'results': [],
-                'total_found': 0,
-                'search_time': 0.0,
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "source_type": "web",
+                "results": [],
+                "total_found": 0,
+                "search_time": 0.0,
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
 class ArxivSearchAgent(LlmAgent):
     """Simulates arXiv academic paper search using LLM (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         instruction = """You are an arXiv academic paper search specialist.
 
 Generate 5-8 realistic arXiv papers with:
@@ -104,7 +102,7 @@ Output format (JSON):
   "search_time": 0.3
 }"""
 
-        # Initialize ADK LlmAgent 
+        # Initialize ADK LlmAgent
         super().__init__(
             name="arxiv_search",
             model=model,
@@ -112,8 +110,8 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.8,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
     def search(self, client: genai.Client, query: str) -> Dict[str, Any]:
@@ -121,33 +119,31 @@ Output format (JSON):
         prompt = f"{self.instruction}\n\nuser: Search query: {query}\n\nGenerate realistic arXiv papers for this query."
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'source_type': 'arxiv',
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "source_type": "arxiv",
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'source_type': 'arxiv',
-                'results': [],
-                'total_found': 0,
-                'search_time': 0.0,
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "source_type": "arxiv",
+                "results": [],
+                "total_found": 0,
+                "search_time": 0.0,
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
 class ScholarSearchAgent(LlmAgent):
     """Simulates Google Scholar academic search using LLM (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         instruction = """You are a Google Scholar search specialist.
 
 Generate 5-8 realistic academic publications with:
@@ -184,8 +180,8 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.8,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
     def search(self, client: genai.Client, query: str) -> Dict[str, Any]:
@@ -193,33 +189,31 @@ Output format (JSON):
         prompt = f"{self.instruction}\n\nuser: Search query: {query}\n\nGenerate realistic Google Scholar results for this query."
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'source_type': 'scholar',
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "source_type": "scholar",
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'source_type': 'scholar',
-                'results': [],
-                'total_found': 0,
-                'search_time': 0.0,
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "source_type": "scholar",
+                "results": [],
+                "total_found": 0,
+                "search_time": 0.0,
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
 class SourceAggregatorAgent(LlmAgent):
     """Aggregates and ranks sources from multiple search agents."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize aggregator agent."""
         instruction = """You are a source aggregation specialist.
 
@@ -260,11 +254,13 @@ Select the top 10-15 most relevant sources."""
             generate_content_config=GenerateContentConfig(
                 temperature=0.3,
                 max_output_tokens=2048,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
-    def aggregate(self, client: genai.Client, search_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def aggregate(
+        self, client: genai.Client, search_results: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Aggregate results from multiple searches using direct genai.Client call (execution)."""
         prompt = f"""{self.instruction}
 
@@ -273,32 +269,32 @@ user: Please aggregate these search results:
 {json.dumps(search_results, indent=2)}"""
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'execution': 'direct_genai_client',
-                'input_sources': len(search_results)
+            result["_metadata"] = {
+                "agent": self.name,
+                "execution": "direct_genai_client",
+                "input_sources": len(search_results),
             }
             return result
         except json.JSONDecodeError:
-            total = sum(r.get('total_found', 0) for r in search_results)
+            total = sum(r.get("total_found", 0) for r in search_results)
             return {
-                'total_sources': total,
-                'unique_sources': total,
-                'top_sources': [],
-                'sources_by_type': {'web': 0, 'arxiv': 0, 'scholar': 0},
-                'aggregation_summary': 'Aggregation failed - JSON parse error',
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "total_sources": total,
+                "unique_sources": total,
+                "top_sources": [],
+                "sources_by_type": {"web": 0, "arxiv": 0, "scholar": 0},
+                "aggregation_summary": "Aggregation failed - JSON parse error",
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
-def create_source_gathering_workflow(model: str = "gemini-2.0-flash") -> SequentialAgent:
+def create_source_gathering_workflow(
+    model: str = "gemini-2.5-flash",
+) -> SequentialAgent:
     """
     Creates a SequentialAgent with ParallelAgent for source gathering.
 
@@ -327,22 +323,19 @@ def create_source_gathering_workflow(model: str = "gemini-2.0-flash") -> Sequent
     # 1. First runs the ParallelAgent (fan-out: all searches run concurrently)
     # 2. Then runs the aggregator (fan-in: combines all results)
 
-
     source_gathering_workflow = None  # REPLACE: Create SequentialAgent here
 
     return source_gathering_workflow
 
 
 async def execute_source_gathering(
-    client: genai.Client,
-    query: str,
-    model: str = "gemini-2.0-flash"
+    client: genai.Client, query: str, model: str = "gemini-2.5-flash"
 ) -> Dict[str, Any]:
     """
     Execute parallel source gathering workflow using ADK ParallelAgent + SequentialAgent.
 
     EXECUTION:
-    - Manually executes workflow logic 
+    - Manually executes workflow logic
     - Uses genai.Client directly for real LLM output
     - Uses asyncio.gather for true parallelism
 
@@ -357,7 +350,7 @@ async def execute_source_gathering(
     print(f"\n Source Gathering: {query[:60]}...")
     print(f"   Pattern: ADK ParallelAgent + SequentialAgent")
 
-    # Create SequentialAgent with ParallelAgent 
+    # Create SequentialAgent with ParallelAgent
     workflow = create_source_gathering_workflow(model=model)
 
     print(f"   Created SequentialAgent: {workflow.name}")
@@ -366,7 +359,7 @@ async def execute_source_gathering(
 
     # Get the sub-agents from SequentialAgent
     parallel_stage = workflow.sub_agents[0]  # ParallelAgent
-    aggregator = workflow.sub_agents[1]      # AggregatorAgent
+    aggregator = workflow.sub_agents[1]  # AggregatorAgent
 
     print(f"   Stage 1 (ParallelAgent): {parallel_stage.name}")
     print(f"      → Type: {type(parallel_stage).__name__}")
@@ -374,7 +367,7 @@ async def execute_source_gathering(
 
     print(f"   Stage 2 (Aggregator): {aggregator.name}")
 
-    # Manually execute the workflow logic 
+    # Manually execute the workflow logic
     print(f"\n   Executing workflow logic (execution)...")
 
     # STAGE 1: Execute parallel searches (fan-out)
@@ -387,19 +380,25 @@ async def execute_source_gathering(
     async def run_web():
         print(f"      → {web_search.name} running...")
         result = web_search.search(client, query)
-        print(f"      ✓ {web_search.name}: Found {result.get('total_found', 0)} sources")
+        print(
+            f"      ✓ {web_search.name}: Found {result.get('total_found', 0)} sources"
+        )
         return result
 
     async def run_arxiv():
         print(f"      → {arxiv_search.name} running...")
         result = arxiv_search.search(client, query)
-        print(f"      ✓ {arxiv_search.name}: Found {result.get('total_found', 0)} sources")
+        print(
+            f"      ✓ {arxiv_search.name}: Found {result.get('total_found', 0)} sources"
+        )
         return result
 
     async def run_scholar():
         print(f"      → {scholar_search.name} running...")
         result = scholar_search.search(client, query)
-        print(f"      ✓ {scholar_search.name}: Found {result.get('total_found', 0)} sources")
+        print(
+            f"      ✓ {scholar_search.name}: Found {result.get('total_found', 0)} sources"
+        )
         return result
 
     # Run all searches in parallel (parallel execution with asyncio.gather)
@@ -418,11 +417,11 @@ async def execute_source_gathering(
     print(f"   ✅ Workflow execution completed")
 
     return {
-        'query': query,
-        'raw_searches': list(search_results),
-        'aggregated_sources': aggregated,
-        'workflow': workflow,  # Include the actual SequentialAgent object
-        'parallel_agent': parallel_stage,  # Include the actual ParallelAgent object
-        'pattern': 'ADK ParallelAgent + SequentialAgent',
-        'execution_mode': 'direct'
+        "query": query,
+        "raw_searches": list(search_results),
+        "aggregated_sources": aggregated,
+        "workflow": workflow,  # Include the actual SequentialAgent object
+        "parallel_agent": parallel_stage,  # Include the actual ParallelAgent object
+        "pattern": "ADK ParallelAgent + SequentialAgent",
+        "execution_mode": "direct",
     }

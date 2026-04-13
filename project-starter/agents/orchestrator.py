@@ -7,7 +7,7 @@ from agents.other_agents import (
     DomainClassifierAgent,
     FactCheckAgent,
     SynthesisAgent,
-    CitationAgent
+    CitationAgent,
 )
 from agents.evaluator import PerformanceEvaluator
 
@@ -16,14 +16,14 @@ async def execute_research_workflow(
     client: genai.Client,
     query: str,
     max_iterations: int = 3,
-    model: str = "gemini-2.0-flash"
+    model: str = "gemini-2.5-flash",
 ) -> Dict[str, Any]:
     """
     Execute complete research assistant workflow.
 
     This function implements the SequentialAgent pattern:
-    - Stage 1: Domain Classification 
-    - Stage 2: Source Gathering 
+    - Stage 1: Domain Classification
+    - Stage 2: Source Gathering
     - Stage 3: Research Refinement
     - Stage 4: Fact Checking (LlmAgent)
     - Stage 5: Synthesis (LlmAgent)
@@ -38,9 +38,9 @@ async def execute_research_workflow(
     Returns:
         Complete research report with all stages
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("AI RESEARCH ASSISTANT - EXECUTION")
-    print("="*80)
+    print("=" * 80)
     print(f"\n Research Query: {query}")
     print(f"   Pattern: SequentialAgent")
     print(f"   Execution: (ADK agents + agent.run_async())")
@@ -50,18 +50,18 @@ async def execute_research_workflow(
     start_time = time.time()
 
     workflow_results = {
-        'query': query,
-        'model': model,
-        'pattern': 'SequentialAgent',
-        'execution_mode': 'direct'
+        "query": query,
+        "model": model,
+        "pattern": "SequentialAgent",
+        "execution_mode": "direct",
     }
 
     # ========================================================================
     # STAGE 1: Domain Classification
     # ========================================================================
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("STAGE 1: Domain Classification ")
-    print("-"*80)
+    print("-" * 80)
 
     domain_classifier = DomainClassifierAgent(model=model)
     classification = domain_classifier.classify(client=client, query=query)
@@ -69,69 +69,66 @@ async def execute_research_workflow(
     print(f"   ✓ Domain: {classification.get('domain', 'unknown')}")
     print(f"   ✓ Confidence: {classification.get('confidence', 0):.2f}")
     print(f"   ✓ Complexity: {classification.get('complexity', 'unknown')}")
-    print(f"   ✓ Recommended sources: {', '.join(classification.get('recommended_sources', []))}")
+    print(
+        f"   ✓ Recommended sources: {', '.join(classification.get('recommended_sources', []))}"
+    )
 
-    workflow_results['stage_1_classification'] = classification
+    workflow_results["stage_1_classification"] = classification
 
     # ========================================================================
     # STAGE 2: Source Gathering
     # ========================================================================
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("STAGE 2: Source Gathering")
-    print("-"*80)
+    print("-" * 80)
 
     sources = await execute_source_gathering(client=client, query=query, model=model)
-    workflow_results['stage_2_sources'] = sources
+    workflow_results["stage_2_sources"] = sources
 
     # ========================================================================
     # STAGE 3: Research Refinement
     # ========================================================================
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("STAGE 3: Research Refinement")
-    print("-"*80)
+    print("-" * 80)
 
     research = await execute_research_loop(
-        client=client,
-        query=query,
-        max_iterations=max_iterations,
-        model=model
+        client=client, query=query, max_iterations=max_iterations, model=model
     )
-    workflow_results['stage_3_research'] = research
+    workflow_results["stage_3_research"] = research
 
     # ========================================================================
     # STAGE 4: Fact Checking (LlmAgent)
     # ========================================================================
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("STAGE 4: Fact Checking (LlmAgent)")
-    print("-"*80)
+    print("-" * 80)
 
     fact_checker = FactCheckAgent(model=model)
     fact_check = fact_checker.check(
-        client=client,
-        answer=research['final_answer'],
-        sources=sources
+        client=client, answer=research["final_answer"], sources=sources
     )
 
     print(f"   ✓ Credibility Score: {fact_check.get('credibility_score', 0):.2f}")
     print(f"   ✓ Verified Claims: {len(fact_check.get('verified_claims', []))}")
     print(f"   ✓ Questionable Claims: {len(fact_check.get('questionable_claims', []))}")
 
-    workflow_results['stage_4_fact_check'] = fact_check
+    workflow_results["stage_4_fact_check"] = fact_check
 
     # ========================================================================
     # STAGE 5: Synthesis (LlmAgent)
     # ========================================================================
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("STAGE 5: Synthesis (LlmAgent)")
-    print("-"*80)
+    print("-" * 80)
 
     synthesizer = SynthesisAgent(model=model)
     synthesis = synthesizer.synthesize(
         client=client,
         query=query,
-        answer=research['final_answer'],
+        answer=research["final_answer"],
         fact_check=fact_check,
-        sources=sources
+        sources=sources,
     )
 
     print(f"   ✓ Synthesis completed")
@@ -139,14 +136,14 @@ async def execute_research_workflow(
     print(f"   ✓ Themes: {len(synthesis.get('themes', []))}")
     print(f"   ✓ Coherence Score: {synthesis.get('coherence_score', 0):.2f}")
 
-    workflow_results['stage_5_synthesis'] = synthesis
+    workflow_results["stage_5_synthesis"] = synthesis
 
     # ========================================================================
     # STAGE 6: Citation Generation (LlmAgent)
     # ========================================================================
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("STAGE 6: Citation Generation (LlmAgent)")
-    print("-"*80)
+    print("-" * 80)
 
     citation_formatter = CitationAgent(model=model)
     citations = citation_formatter.format_citations(client=client, sources=sources)
@@ -155,19 +152,21 @@ async def execute_research_workflow(
     print(f"   ✓ Total Citations: {citations.get('total_citations', 0)}")
     print(f"   ✓ Style: {citations.get('citation_style', 'APA')}")
 
-    workflow_results['stage_6_citations'] = citations
+    workflow_results["stage_6_citations"] = citations
 
     # ========================================================================
     # WORKFLOW SUMMARY
     # ========================================================================
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("WORKFLOW COMPLETED")
-    print("="*80)
+    print("=" * 80)
     print(f"\n. All 7 stages executed successfully")
     print(f"\n. Results Summary:")
     print(f"   • Query: {query}")
     print(f"   • Domain: {classification.get('domain', 'unknown')}")
-    print(f"   • Sources Found: {sources['aggregated_sources'].get('total_sources', 0)}")
+    print(
+        f"   • Sources Found: {sources['aggregated_sources'].get('total_sources', 0)}"
+    )
     print(f"   • Research Iterations: {research['iterations_run']}")
     print(f"   • Credibility Score: {fact_check.get('credibility_score', 0):.2f}")
     print(f"   • Citations: {citations.get('total_citations', 0)}")
@@ -180,7 +179,7 @@ async def execute_research_workflow(
     # ========================================================================
     # STAGE 7: Performance Evaluation
     # ========================================================================
-    # TODO 8: Track workflow performance metrics 
+    # TODO 8: Track workflow performance metrics
     #
     # Instantiate PerformanceEvaluator and record the workflow results.
     #
@@ -190,17 +189,19 @@ async def execute_research_workflow(
     # 3. Record metrics
     # 4. Get summary
     # 5. Add to workflow_results
-   
-    print("\n" + "-"*80)
+
+    print("\n" + "-" * 80)
     print("STAGE 7: Performance Evaluation")
-    print("-"*80)
+    print("-" * 80)
 
     # TODO 8: Implement performance evaluation here
     # Replace the None values below with actual implementation
 
     execution_time = None  # REPLACE: Calculate execution time
-    evaluator = None       # REPLACE: Create PerformanceEvaluator instance
-    performance_summary = None  # REPLACE: Get performance summary after recording metrics
+    evaluator = None  # REPLACE: Create PerformanceEvaluator instance
+    performance_summary = (
+        None  # REPLACE: Get performance summary after recording metrics
+    )
 
     # This section will work once you complete TODO 8
     if execution_time and evaluator and performance_summary:
@@ -209,19 +210,19 @@ async def execute_research_workflow(
         print(f"   ✓ Health Status: {performance_summary['health_status']}")
         print(f"   ✓ Queries Processed: {evaluator.metrics.queries_processed}")
 
-        if performance_summary['bottlenecks']:
+        if performance_summary["bottlenecks"]:
             print(f"   ⚠️  Bottlenecks Identified:")
-            for bottleneck in performance_summary['bottlenecks']:
+            for bottleneck in performance_summary["bottlenecks"]:
                 print(f"      • {bottleneck}")
 
-        workflow_results['stage_7_performance'] = {
-            'execution_time': execution_time,
-            'performance_summary': performance_summary,
-            'evaluator': evaluator
+        workflow_results["stage_7_performance"] = {
+            "execution_time": execution_time,
+            "performance_summary": performance_summary,
+            "evaluator": evaluator,
         }
     else:
         print(f"   ⚠️  Performance evaluation not implemented (complete TODO 8)")
-        workflow_results['stage_7_performance'] = None
+        workflow_results["stage_7_performance"] = None
 
     return workflow_results
 
@@ -235,13 +236,13 @@ def generate_research_report(workflow_results: Dict[str, Any]) -> str:
     Returns:
         Formatted markdown report
     """
-    query = workflow_results['query']
-    classification = workflow_results['stage_1_classification']
-    sources = workflow_results['stage_2_sources']
-    research = workflow_results['stage_3_research']
-    fact_check = workflow_results['stage_4_fact_check']
-    synthesis = workflow_results['stage_5_synthesis']
-    citations = workflow_results['stage_6_citations']
+    query = workflow_results["query"]
+    classification = workflow_results["stage_1_classification"]
+    sources = workflow_results["stage_2_sources"]
+    research = workflow_results["stage_3_research"]
+    fact_check = workflow_results["stage_4_fact_check"]
+    synthesis = workflow_results["stage_5_synthesis"]
+    citations = workflow_results["stage_6_citations"]
 
     report = f"""
 # Research Report: {query}

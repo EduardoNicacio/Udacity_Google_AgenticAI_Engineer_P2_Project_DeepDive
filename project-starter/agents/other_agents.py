@@ -8,7 +8,7 @@ from google.genai.types import GenerateContentConfig
 class DomainClassifierAgent(LlmAgent):
     """Classifies research queries into domains."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize domain classifier.
 
         Args:
@@ -51,8 +51,8 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.3,
                 max_output_tokens=512,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
     def classify(self, client: genai.Client, query: str) -> Dict[str, Any]:
@@ -71,34 +71,32 @@ Output format (JSON):
         prompt = f"{self.instruction}\n\nuser: Classify this research query: {query}"
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'domain': 'general',
-                'confidence': 0.5,
-                'complexity': 'medium',
-                'reasoning': 'Classification failed',
-                'recommended_sources': ['web', 'arxiv', 'scholar'],
-                'keywords': [],
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "domain": "general",
+                "confidence": 0.5,
+                "complexity": "medium",
+                "reasoning": "Classification failed",
+                "recommended_sources": ["web", "arxiv", "scholar"],
+                "keywords": [],
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
 class FactCheckAgent(LlmAgent):
     """Validates research claims for accuracy (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize fact checker.
 
         Args:
@@ -130,12 +128,16 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.3,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
-    def check(self, client: genai.Client, answer: Dict[str, Any],
-              sources: Dict[str, Any] = None) -> Dict[str, Any]:
+    def check(
+        self,
+        client: genai.Client,
+        answer: Dict[str, Any],
+        sources: Dict[str, Any] = None,
+    ) -> Dict[str, Any]:
         """Fact-check research answer using direct genai.Client call.
 
         Args:
@@ -157,34 +159,32 @@ Key Points: {json.dumps(answer.get('key_points', []))}
             prompt += f"\nSources mentioned: {json.dumps(sources.get('aggregated_sources', {}).get('top_sources', [])[:5], indent=2)}"
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'verified_claims': [],
-                'questionable_claims': [],
-                'credibility_score': 0.5,
-                'verification_notes': 'Fact-checking failed',
-                'sources_checked': [],
-                'recommendations': [],
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "verified_claims": [],
+                "questionable_claims": [],
+                "credibility_score": 0.5,
+                "verification_notes": "Fact-checking failed",
+                "sources_checked": [],
+                "recommendations": [],
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
 class SynthesisAgent(LlmAgent):
     """Synthesizes research findings into coherent narrative (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize synthesis agent.
 
         Args:
@@ -217,12 +217,18 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.7,
                 max_output_tokens=2048,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
-    def synthesize(self, client: genai.Client, query: str, answer: Dict[str, Any],
-                    fact_check: Dict[str, Any], sources: Dict[str, Any]) -> Dict[str, Any]:
+    def synthesize(
+        self,
+        client: genai.Client,
+        query: str,
+        answer: Dict[str, Any],
+        fact_check: Dict[str, Any],
+        sources: Dict[str, Any],
+    ) -> Dict[str, Any]:
         """Synthesize research findings using direct genai.Client call.
 
         Args:
@@ -250,34 +256,32 @@ Credibility: {fact_check.get('credibility_score', 0.5)}
 Top Sources: {len(sources.get('aggregated_sources', {}).get('top_sources', []))} sources available"""
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'synthesis': answer.get('answer', 'Synthesis failed'),
-                'key_insights': answer.get('key_points', []),
-                'themes': [],
-                'recommendations': [],
-                'coherence_score': 0.5,
-                'executive_summary': 'Synthesis failed',
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "synthesis": answer.get("answer", "Synthesis failed"),
+                "key_insights": answer.get("key_points", []),
+                "themes": [],
+                "recommendations": [],
+                "coherence_score": 0.5,
+                "executive_summary": "Synthesis failed",
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
 class CitationAgent(LlmAgent):
     """Generates properly formatted citations (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize citation agent.
 
         Args:
@@ -313,11 +317,13 @@ Output format (JSON):
             generate_content_config=GenerateContentConfig(
                 temperature=0.1,
                 max_output_tokens=1536,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
-    def format_citations(self, client: genai.Client, sources: Dict[str, Any]) -> Dict[str, Any]:
+    def format_citations(
+        self, client: genai.Client, sources: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Format citations for sources using direct genai.Client call.
 
         Args:
@@ -327,7 +333,7 @@ Output format (JSON):
         Returns:
             Formatted citations
         """
-        top_sources = sources.get('aggregated_sources', {}).get('top_sources', [])
+        top_sources = sources.get("aggregated_sources", {}).get("top_sources", [])
 
         prompt = f"""{self.instruction}
 
@@ -336,23 +342,21 @@ user: Generate citations for these sources:
 {json.dumps(top_sources[:10], indent=2)}"""
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'citations': [],
-                'bibliography': '',
-                'total_citations': 0,
-                'citation_style': 'APA',
-                '_metadata': {'agent': self.name, 'error': 'json_parse_error'}
+                "citations": [],
+                "bibliography": "",
+                "total_citations": 0,
+                "citation_style": "APA",
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }

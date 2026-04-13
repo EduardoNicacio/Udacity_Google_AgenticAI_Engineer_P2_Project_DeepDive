@@ -17,7 +17,7 @@ class SynthesisAgent(LlmAgent):
     Pattern: LlmAgent for knowledge synthesis
     """
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize the synthesis agent.
 
         Args:
@@ -61,8 +61,8 @@ Create publication-quality research syntheses that are clear, accurate, and insi
             generate_content_config=GenerateContentConfig(
                 temperature=0.5,
                 max_output_tokens=2048,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
 
@@ -75,7 +75,7 @@ class CitationAgent(LlmAgent):
     Pattern: LlmAgent for formatting tasks
     """
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize the citation agent.
 
         Args:
@@ -120,6 +120,6 @@ Generate accurate, properly formatted citations for all sources."""
             generate_content_config=GenerateContentConfig(
                 temperature=0.1,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )

@@ -15,8 +15,15 @@ class PerformanceMetrics:
     fact_checks_performed: List[int] = field(default_factory=list)
     citations_generated: List[int] = field(default_factory=list)
 
-    def record_query(self, quality: float, time: float, sources: int,
-                    iterations: int, fact_checks: int, citations: int):
+    def record_query(
+        self,
+        quality: float,
+        time: float,
+        sources: int,
+        iterations: int,
+        fact_checks: int,
+        citations: int,
+    ):
         """Record metrics for a completed query."""
         self.queries_processed += 1
         self.quality_scores.append(quality)
@@ -47,7 +54,9 @@ class PerformanceMetrics:
             "total_sources": self.get_total_sources(),
             "total_citations": sum(self.citations_generated),
             "total_fact_checks": sum(self.fact_checks_performed),
-            "average_iterations": statistics.mean(self.iterations_used) if self.iterations_used else 0.0
+            "average_iterations": (
+                statistics.mean(self.iterations_used) if self.iterations_used else 0.0
+            ),
         }
 
 
@@ -74,7 +83,7 @@ class PerformanceEvaluator:
             sources=result.get("sources_found", 0),
             iterations=result.get("iterations", 0),
             fact_checks=result.get("fact_checks", 0),
-            citations=result.get("citations_count", 0)
+            citations=result.get("citations_count", 0),
         )
 
     def analyze_performance(self) -> Dict[str, Any]:
@@ -100,7 +109,9 @@ class PerformanceEvaluator:
         # Identify bottlenecks
         bottlenecks = []
         if avg_quality < 0.75:
-            bottlenecks.append("Low quality scores - consider adjusting prompts or increasing iterations")
+            bottlenecks.append(
+                "Low quality scores - consider adjusting prompts or increasing iterations"
+            )
         if summary["average_response_time"] > 60:
             bottlenecks.append("Slow response times - optimize source gathering")
         if summary["total_sources"] / max(summary["queries_processed"], 1) < 10:
@@ -111,7 +122,7 @@ class PerformanceEvaluator:
             "health_status": health_status,
             "bottlenecks": bottlenecks,
             "performance_score": avg_quality,
-            "recommendations": self._generate_recommendations(summary)
+            "recommendations": self._generate_recommendations(summary),
         }
 
     def _generate_recommendations(self, summary: Dict[str, Any]) -> List[str]:
@@ -119,12 +130,18 @@ class PerformanceEvaluator:
         recommendations = []
 
         if summary["average_quality"] < 0.80:
-            recommendations.append("Increase max_iterations or adjust quality thresholds")
+            recommendations.append(
+                "Increase max_iterations or adjust quality thresholds"
+            )
 
         if summary["total_sources"] / max(summary["queries_processed"], 1) < 15:
-            recommendations.append("Enable additional source types or increase source gathering")
+            recommendations.append(
+                "Enable additional source types or increase source gathering"
+            )
 
         if summary["average_iterations"] < 1.5:
-            recommendations.append("Queries completing too quickly - may need stricter quality criteria")
+            recommendations.append(
+                "Queries completing too quickly - may need stricter quality criteria"
+            )
 
         return recommendations or ["System performing well - no changes recommended"]

@@ -11,7 +11,7 @@ class ResearcherAgent(LlmAgent):
 
     """
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize the researcher agent.
 
         Args:
@@ -45,11 +45,13 @@ Focus on accuracy, clarity, and continuous improvement. Each iteration should sh
             generate_content_config=GenerateContentConfig(
                 temperature=0.7,
                 max_output_tokens=1024,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
-    def generate(self, client: genai.Client, query: str, context: List[Dict[str, str]] = None) -> Dict[str, Any]:
+    def generate(
+        self, client: genai.Client, query: str, context: List[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
         """Generate research answer using direct genai.Client call.
 
         This is the execution part - use agent's config but execute directly.
@@ -73,31 +75,26 @@ Focus on accuracy, clarity, and continuous improvement. Each iteration should sh
 
         # Direct execution using genai.Client (part)
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         # Parse JSON response
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'model': self.model,
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "model": self.model,
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'answer': response.text,
-                'key_points': [],
-                'sources_mentioned': [],
-                'confidence': 'low',
-                'iteration_notes': 'JSON parsing failed',
-                '_metadata': {
-                    'agent': self.name,
-                    'error': 'json_parse_error'
-                }
+                "answer": response.text,
+                "key_points": [],
+                "sources_mentioned": [],
+                "confidence": "low",
+                "iteration_notes": "JSON parsing failed",
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
@@ -107,40 +104,41 @@ class ResearchCriticAgent(LlmAgent):
 
     """
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize the critic agent.
 
         Args:
             model: Gemini model name
         """
-        instruction = """You are a research quality critic that evaluates answers.
+        instruction = """
+            You are a research quality critic that evaluates answers.
 
-Your role:
-1. Evaluate the answer for accuracy, completeness, and clarity
-2. Assign a quality level: excellent, good, needs_improvement, or poor
-3. Provide specific, actionable feedback for improvement
-4. Decide if answer is good enough to stop, or needs another iteration
-5. Calculate a quality score (0-1) based on your assessment
+            Your role:
+            1. Evaluate the answer for accuracy, completeness, and clarity
+            2. Assign a quality level: excellent, good, needs_improvement, or poor
+            3. Provide specific, actionable feedback for improvement
+            4. Decide if answer is good enough to stop, or needs another iteration
+            5. Calculate a quality score (0-1) based on your assessment
 
-Quality criteria:
-- Excellent (0.90-1.00): Thorough, accurate, well-structured, comprehensive evidence
-- Good (0.80-0.89): Accurate and complete, all key points covered
-- Needs Improvement (0.50-0.79): Missing key points, needs more evidence or clarity
-- Poor (0.00-0.49): Incomplete, unclear, or potentially inaccurate
+            Quality criteria:
+            - Excellent (0.90-1.00): Thorough, accurate, well-structured, comprehensive evidence
+            - Good (0.80-0.89): Accurate and complete, all key points covered
+            - Needs Improvement (0.50-0.79): Missing key points, needs more evidence or clarity
+            - Poor (0.00-0.49): Incomplete, unclear, or potentially inaccurate
 
-Output format (JSON):
-{
-  "quality": "excellent/good/needs_improvement/poor",
-  "quality_score": 0.85,
-  "feedback": "Specific feedback for improvement",
-  "strengths": ["strength1", "strength2"],
-  "weaknesses": ["weakness1", "weakness2"],
-  "should_stop": true/false,
-  "reasoning": "Why to stop or continue"
-}
+            Output format (JSON):
+            {
+                "quality": "excellent/good/needs_improvement/poor",
+                "quality_score": 0.85,
+                "feedback": "Specific feedback for improvement",
+                "strengths": ["strength1", "strength2"],
+                "weaknesses": ["weakness1", "weakness2"],
+                "should_stop": true/false,
+                "reasoning": "Why to stop or continue"
+            }
 
-Set should_stop=true ONLY if quality_score >= 0.80.
-Otherwise set should_stop=false to trigger another iteration."""
+            Set should_stop=true ONLY if quality_score >= 0.80.
+            Otherwise set should_stop=false to trigger another iteration."""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -150,11 +148,13 @@ Otherwise set should_stop=false to trigger another iteration."""
             generate_content_config=GenerateContentConfig(
                 temperature=0.3,
                 max_output_tokens=768,
-                response_mime_type="application/json"
-            )
+                response_mime_type="application/json",
+            ),
         )
 
-    def evaluate(self, client: genai.Client, question: str, answer: Dict[str, Any]) -> Dict[str, Any]:
+    def evaluate(
+        self, client: genai.Client, question: str, answer: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Evaluate research answer quality using direct genai.Client call.
 
         This is the execution part - use agent's config but execute directly.
@@ -169,46 +169,42 @@ Otherwise set should_stop=false to trigger another iteration."""
         """
         prompt = f"""{self.instruction}
 
-user: Please evaluate this research answer:
+            User: Please evaluate this research answer:
 
-Question: {question}
+            Question: {question}
 
-Answer: {answer.get('answer', 'No answer provided')}
-Key Points: {json.dumps(answer.get('key_points', []))}
-Confidence: {answer.get('confidence', 'unknown')}"""
+            Answer: {answer.get('answer', 'No answer provided')}
+            Key Points: {json.dumps(answer.get('key_points', []))}
+            Confidence: {answer.get('confidence', 'unknown')}"""
 
         response = client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=self.generate_content_config
+            model=self.model, contents=prompt, config=self.generate_content_config
         )
 
         try:
             result = json.loads(response.text)
-            result['_metadata'] = {
-                'agent': self.name,
-                'model': self.model,
-                'execution': 'direct_genai_client'
+            result["_metadata"] = {
+                "agent": self.name,
+                "model": self.model,
+                "execution": "direct_genai_client",
             }
             return result
         except json.JSONDecodeError:
             return {
-                'quality': 'needs_improvement',
-                'quality_score': 0.5,
-                'feedback': 'Unable to parse evaluation',
-                'strengths': [],
-                'weaknesses': ['Evaluation failed'],
-                'should_stop': False,
-                'reasoning': 'JSON parsing failed',
-                '_metadata': {
-                    'agent': self.name,
-                    'error': 'json_parse_error'
-                }
+                "quality": "needs_improvement",
+                "quality_score": 0.5,
+                "feedback": "Unable to parse evaluation",
+                "strengths": [],
+                "weaknesses": ["Evaluation failed"],
+                "should_stop": False,
+                "reasoning": "JSON parsing failed",
+                "_metadata": {"agent": self.name, "error": "json_parse_error"},
             }
 
 
-def create_research_loop_agent(model: str = "gemini-2.0-flash",
-                                max_iterations: int = 3) -> LoopAgent:
+def create_research_loop_agent(
+    model: str = "gemini-2.5-flash", max_iterations: int = 3
+) -> LoopAgent:
     """
     Creates a LoopAgent for iterative research refinement.
 
@@ -226,7 +222,7 @@ def create_research_loop_agent(model: str = "gemini-2.0-flash",
     # - ResearchCriticAgent: The validator that evaluates quality
 
     researcher = None  # REPLACE: Create ResearcherAgent here
-    critic = None      # REPLACE: Create ResearchCriticAgent here
+    critic = None  # REPLACE: Create ResearchCriticAgent here
 
     # TODO 2: Compose agents into LoopAgent
     #
@@ -242,7 +238,7 @@ async def execute_research_loop(
     client: genai.Client,
     query: str,
     max_iterations: int = 3,
-    model: str = "gemini-2.0-flash"
+    model: str = "gemini-2.5-flash",
 ) -> Dict[str, Any]:
     """
     Execute iterative research refinement using ADK LoopAgent.
@@ -282,36 +278,38 @@ async def execute_research_loop(
 
         # Researcher generates/improves answer
         print(f"      → {researcher.name} generating answer...")
-        answer = researcher.generate(client, query, context=context if context else None)
+        answer = researcher.generate(
+            client, query, context=context if context else None
+        )
 
-        context.append({
-            'role': 'researcher',
-            'content': json.dumps(answer)
-        })
+        context.append({"role": "researcher", "content": json.dumps(answer)})
 
-        print(f"      ✓ Answer generated (confidence: {answer.get('confidence', 'unknown')})")
+        print(
+            f"      ✓ Answer generated (confidence: {answer.get('confidence', 'unknown')})"
+        )
 
         # Critic evaluates quality
         print(f"      → {critic.name} evaluating quality...")
         evaluation = critic.evaluate(client, question=query, answer=answer)
 
-        context.append({
-            'role': 'critic',
-            'content': json.dumps(evaluation)
-        })
+        context.append({"role": "critic", "content": json.dumps(evaluation)})
 
-        quality_score = evaluation.get('quality_score', 0.5)
-        should_stop = evaluation.get('should_stop', False)
+        quality_score = evaluation.get("quality_score", 0.5)
+        should_stop = evaluation.get("should_stop", False)
 
-        print(f"      ✓ Quality: {evaluation.get('quality', 'unknown')} (score: {quality_score:.2f})")
+        print(
+            f"      ✓ Quality: {evaluation.get('quality', 'unknown')} (score: {quality_score:.2f})"
+        )
 
         # Record iteration
-        iteration_history.append({
-            'iteration': iteration,
-            'answer': answer,
-            'evaluation': evaluation,
-            'should_stop': should_stop
-        })
+        iteration_history.append(
+            {
+                "iteration": iteration,
+                "answer": answer,
+                "evaluation": evaluation,
+                "should_stop": should_stop,
+            }
+        )
 
         # Check termination (mimics ADK LoopAgent escalate logic)
         if should_stop:
@@ -321,21 +319,23 @@ async def execute_research_loop(
         else:
             print(f"      Quality below threshold - Continue refining...")
             if iteration < max_iterations:
-                print(f"      Feedback: {evaluation.get('feedback', 'No feedback')[:80]}...")
+                print(
+                    f"      Feedback: {evaluation.get('feedback', 'No feedback')[:80]}..."
+                )
 
     # If loop exhausted without should_stop
     if not final_answer:
         print(f"\n   Max iterations reached - Returning best attempt")
-        final_answer = iteration_history[-1]['answer'] if iteration_history else {}
+        final_answer = iteration_history[-1]["answer"] if iteration_history else {}
 
     print(f"   LoopAgent execution completed ({len(iteration_history)} iterations)")
 
     return {
-        'query': query,
-        'final_answer': final_answer,
-        'iterations_run': len(iteration_history),
-        'iteration_history': iteration_history,
-        'loop_agent': loop_agent,  # Include the actual LoopAgent object
-        'pattern': 'ADK LoopAgent',
-        'execution_mode': 'direct'
+        "query": query,
+        "final_answer": final_answer,
+        "iterations_run": len(iteration_history),
+        "iteration_history": iteration_history,
+        "loop_agent": loop_agent,  # Include the actual LoopAgent object
+        "pattern": "ADK LoopAgent",
+        "execution_mode": "direct",
     }
