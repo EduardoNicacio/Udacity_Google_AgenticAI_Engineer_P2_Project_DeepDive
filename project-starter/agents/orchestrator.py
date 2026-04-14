@@ -38,13 +38,14 @@ async def execute_research_workflow(
     Returns:
         Complete research report with all stages
     """
+
     print("\n" + "=" * 80)
     print("AI RESEARCH ASSISTANT - EXECUTION")
     print("=" * 80)
     print(f"\n Research Query: {query}")
-    print(f"   Pattern: SequentialAgent")
-    print(f"   Execution: (ADK agents + agent.run_async())")
-    print(f"   Model: {model}")
+    print("\n   Pattern: SequentialAgent")
+    print("\n   Execution: (ADK agents + agent.run_async())")
+    print("\n   Model: {model}")
 
     # Track execution time for performance evaluation
     start_time = time.time()
@@ -73,7 +74,7 @@ async def execute_research_workflow(
         f"   ✓ Recommended sources: {', '.join(classification.get('recommended_sources', []))}"
     )
 
-    workflow_results["stage_1_classification"] = classification
+    workflow_results["stage_1_classification"] = classification # type: ignore
 
     # ========================================================================
     # STAGE 2: Source Gathering
@@ -83,7 +84,7 @@ async def execute_research_workflow(
     print("-" * 80)
 
     sources = await execute_source_gathering(client=client, query=query, model=model)
-    workflow_results["stage_2_sources"] = sources
+    workflow_results["stage_2_sources"] = sources # type: ignore
 
     # ========================================================================
     # STAGE 3: Research Refinement
@@ -95,7 +96,7 @@ async def execute_research_workflow(
     research = await execute_research_loop(
         client=client, query=query, max_iterations=max_iterations, model=model
     )
-    workflow_results["stage_3_research"] = research
+    workflow_results["stage_3_research"] = research # type: ignore
 
     # ========================================================================
     # STAGE 4: Fact Checking (LlmAgent)
@@ -113,7 +114,7 @@ async def execute_research_workflow(
     print(f"   ✓ Verified Claims: {len(fact_check.get('verified_claims', []))}")
     print(f"   ✓ Questionable Claims: {len(fact_check.get('questionable_claims', []))}")
 
-    workflow_results["stage_4_fact_check"] = fact_check
+    workflow_results["stage_4_fact_check"] = fact_check # type: ignore
 
     # ========================================================================
     # STAGE 5: Synthesis (LlmAgent)
@@ -131,12 +132,12 @@ async def execute_research_workflow(
         sources=sources,
     )
 
-    print(f"   ✓ Synthesis completed")
+    print( "   ✓ Synthesis completed")
     print(f"   ✓ Key Insights: {len(synthesis.get('key_insights', []))}")
     print(f"   ✓ Themes: {len(synthesis.get('themes', []))}")
     print(f"   ✓ Coherence Score: {synthesis.get('coherence_score', 0):.2f}")
 
-    workflow_results["stage_5_synthesis"] = synthesis
+    workflow_results["stage_5_synthesis"] = synthesis # type: ignore
 
     # ========================================================================
     # STAGE 6: Citation Generation (LlmAgent)
@@ -148,11 +149,11 @@ async def execute_research_workflow(
     citation_formatter = CitationAgent(model=model)
     citations = citation_formatter.format_citations(client=client, sources=sources)
 
-    print(f"   ✓ Citations formatted")
+    print( "   ✓ Citations formatted")
     print(f"   ✓ Total Citations: {citations.get('total_citations', 0)}")
     print(f"   ✓ Style: {citations.get('citation_style', 'APA')}")
 
-    workflow_results["stage_6_citations"] = citations
+    workflow_results["stage_6_citations"] = citations # type: ignore
 
     # ========================================================================
     # WORKFLOW SUMMARY
@@ -160,26 +161,24 @@ async def execute_research_workflow(
     print("\n" + "=" * 80)
     print("WORKFLOW COMPLETED")
     print("=" * 80)
-    print(f"\n. All 7 stages executed successfully")
-    print(f"\n. Results Summary:")
+    print("\n  All 7 stages executed successfully")
+    print("  Results Summary:")
     print(f"   • Query: {query}")
     print(f"   • Domain: {classification.get('domain', 'unknown')}")
-    print(
-        f"   • Sources Found: {sources['aggregated_sources'].get('total_sources', 0)}"
-    )
+    print(f"   • Sources Found: {sources['aggregated_sources'].get('total_sources', 0)}")
     print(f"   • Research Iterations: {research['iterations_run']}")
     print(f"   • Credibility Score: {fact_check.get('credibility_score', 0):.2f}")
     print(f"   • Citations: {citations.get('total_citations', 0)}")
-    print(f"\n  Execution Method:")
-    print(f"   ✓ All agents inherit from ADK base classes")
-    print(f"   ✓ Executed via agent.run_async() with genai.Client")
-    print(f"   ✓ No ADK server deployment required")
-    print(f"   ✓ Real LLM output from Vertex AI Gemini")
+    print("  Execution Method:")
+    print("   ✓ All agents inherit from ADK base classes")
+    print("   ✓ Executed via agent.run_async() with genai.Client")
+    print("   ✓ No ADK server deployment required")
+    print("   ✓ Real LLM output from Vertex AI Gemini")
 
     # ========================================================================
     # STAGE 7: Performance Evaluation
     # ========================================================================
-    # TODO 8: Track workflow performance metrics
+    # Completed: Track workflow performance metrics
     #
     # Instantiate PerformanceEvaluator and record the workflow results.
     #
@@ -194,14 +193,29 @@ async def execute_research_workflow(
     print("STAGE 7: Performance Evaluation")
     print("-" * 80)
 
-    # TODO 8: Implement performance evaluation here
+    # Completed: Implement performance evaluation here
     # Replace the None values below with actual implementation
 
-    execution_time = None  # REPLACE: Calculate execution time
-    evaluator = None  # REPLACE: Create PerformanceEvaluator instance
-    performance_summary = (
-        None  # REPLACE: Get performance summary after recording metrics
+    # Step 1: Calculate total wall-clock time for the entire workflow
+    execution_time = time.time() - start_time
+ 
+    # Step 2: Instantiate the evaluator
+    evaluator = PerformanceEvaluator()
+ 
+    # Step 3: Record all observable metrics from the completed workflow stages
+    evaluator.evaluate_query_result(
+        result={
+            "quality_score": fact_check.get("credibility_score", 0), # Using credibility as quality proxy
+            "sources_found": sources["aggregated_sources"].get("total_sources", 0),
+            "iterations": research["iterations_run"], 
+            "fact_checks": len(fact_check.get("verified_claims", [])) + len(fact_check.get("questionable_claims", [])), # Total claims checked
+            "citations_count": citations.get("total_citations", 0)
+        },
+        processing_time=execution_time
     )
+ 
+    # Step 4: Retrieve the aggregated summary with scores, health status, and bottlenecks
+    performance_summary = evaluator.analyze_performance()
 
     # This section will work once you complete TODO 8
     if execution_time and evaluator and performance_summary:
@@ -211,18 +225,18 @@ async def execute_research_workflow(
         print(f"   ✓ Queries Processed: {evaluator.metrics.queries_processed}")
 
         if performance_summary["bottlenecks"]:
-            print(f"   ⚠️  Bottlenecks Identified:")
+            print("   ⚠️  Bottlenecks Identified:")
             for bottleneck in performance_summary["bottlenecks"]:
                 print(f"      • {bottleneck}")
 
-        workflow_results["stage_7_performance"] = {
+        workflow_results["stage_7_performance"] = { # type: ignore
             "execution_time": execution_time,
             "performance_summary": performance_summary,
             "evaluator": evaluator,
         }
     else:
-        print(f"   ⚠️  Performance evaluation not implemented (complete TODO 8)")
-        workflow_results["stage_7_performance"] = None
+        print("   ⚠️  Performance evaluation not implemented (complete TODO 8)")
+        workflow_results["stage_7_performance"] = None # type: ignore
 
     return workflow_results
 
@@ -245,90 +259,93 @@ def generate_research_report(workflow_results: Dict[str, Any]) -> str:
     citations = workflow_results["stage_6_citations"]
 
     report = f"""
-# Research Report: {query}
+        # Research Report: {query}
 
-## Executive Summary
-{synthesis.get('executive_summary', 'No summary available')}
+        ## Executive Summary
+        
+        {synthesis.get('executive_summary', 'No summary available')}
 
-**Domain:** {classification.get('domain', 'Unknown')}
-**Credibility Score:** {fact_check.get('credibility_score', 0):.2f}/1.00
-**Sources Consulted:** {sources['aggregated_sources'].get('total_sources', 0)}
-**Research Iterations:** {research['iterations_run']}
+        **Domain:** {classification.get('domain', 'Unknown')}
+        **Credibility Score:** {fact_check.get('credibility_score', 0):.2f}/1.00
+        **Sources Consulted:** {sources['aggregated_sources'].get('total_sources', 0)}
+        **Research Iterations:** {research['iterations_run']}
 
----
+        ---
 
-## Research Findings
+        ## Research Findings
 
-{synthesis.get('synthesis', research['final_answer'].get('answer', 'No findings available'))}
+        {synthesis.get('synthesis', research['final_answer'].get('answer', 'No findings available'))}
 
----
+        ---
 
-## Key Insights
+        ## Key Insights
 
-{chr(10).join(f"{i+1}. {insight}" for i, insight in enumerate(synthesis.get('key_insights', [])))}
+        {chr(10).join(f"{i+1}. {insight}" for i, insight in enumerate(synthesis.get('key_insights', [])))}
 
----
+        ---
 
-## Major Themes
+        ## Major Themes
 
-{chr(10).join(f"- {theme}" for theme in synthesis.get('themes', []))}
+        {chr(10).join(f"- {theme}" for theme in synthesis.get('themes', []))}
 
----
+        ---
 
-## Recommendations
+        ## Recommendations
 
-{chr(10).join(f"{i+1}. {rec}" for i, rec in enumerate(synthesis.get('recommendations', [])))}
+        {chr(10).join(f"{i+1}. {rec}" for i, rec in enumerate(synthesis.get('recommendations', [])))}
 
----
+        ---
 
-## Quality Assessment
+        ## Quality Assessment
 
-**Research Quality Score:** {research.get('final_answer', {}).get('confidence', 'unknown')}
-**Credibility Score:** {fact_check.get('credibility_score', 0):.2f}/1.00
-**Coherence Score:** {synthesis.get('coherence_score', 0):.2f}/1.00
+        **Research Quality Score:** {research.get('final_answer', {}).get('confidence', 'unknown')}
+        **Credibility Score:** {fact_check.get('credibility_score', 0):.2f}/1.00
+        **Coherence Score:** {synthesis.get('coherence_score', 0):.2f}/1.00
 
-### Verified Claims
-{chr(10).join(f"✓ {claim}" for claim in fact_check.get('verified_claims', [])[:5])}
+        ### Verified Claims
+        
+        {chr(10).join(f"✓ {claim}" for claim in fact_check.get('verified_claims', [])[:5])}
 
-### Areas for Further Investigation
-{chr(10).join(f"⚠️  {claim}" for claim in fact_check.get('questionable_claims', [])[:3])}
+        ### Areas for Further Investigation
+        
+        {chr(10).join(f"⚠️  {claim}" for claim in fact_check.get('questionable_claims', [])[:3])}
 
----
+        ---
 
-## Sources
+        ## Sources
 
-**Total Sources:** {sources['aggregated_sources'].get('total_sources', 0)}
-**Unique Sources:** {sources['aggregated_sources'].get('unique_sources', 0)}
+        **Total Sources:** {sources['aggregated_sources'].get('total_sources', 0)}
+        **Unique Sources:** {sources['aggregated_sources'].get('unique_sources', 0)}
 
-### Source Distribution
-- Web: {sources['aggregated_sources'].get('sources_by_type', {}).get('web', 0)}
-- ArXiv: {sources['aggregated_sources'].get('sources_by_type', {}).get('arxiv', 0)}
-- Google Scholar: {sources['aggregated_sources'].get('sources_by_type', {}).get('scholar', 0)}
+        ### Source Distribution
+        - Web: {sources['aggregated_sources'].get('sources_by_type', {}).get('web', 0)}
+        - ArXiv: {sources['aggregated_sources'].get('sources_by_type', {}).get('arxiv', 0)}
+        - Google Scholar: {sources['aggregated_sources'].get('sources_by_type', {}).get('scholar', 0)}
 
----
+        ---
 
-## Bibliography
+        ## Bibliography
 
-{citations.get('bibliography', 'No bibliography available')}
+        {citations.get('bibliography', 'No bibliography available')}
 
----
+        ---
 
-## Methodology
+        ## Methodology
 
-This research report was generated using an ADK-based multi-agent system with the following workflow:
+        This research report was generated using an ADK-based multi-agent system with the following workflow:
 
-1. **Domain Classification** 
-2. **Parallel Source Gathering** 
-3. **Iterative Research Refinement** 
-4. **Fact Checking** (LlmAgent validation)
-5. **Synthesis** (LlmAgent integration)
-6. **Citation Formatting** (LlmAgent academic standards)
+        1. **Domain Classification** 
+        2. **Parallel Source Gathering** 
+        3. **Iterative Research Refinement** 
+        4. **Fact Checking** (LlmAgent validation)
+        5. **Synthesis** (LlmAgent integration)
+        6. **Citation Formatting** (LlmAgent academic standards)
 
-**Model:** {workflow_results['model']}
+        **Model:** {workflow_results['model']}
 
----
+        ---
 
-*Report generated by AI Research Assistant
-"""
+        *Report generated by AI Research Assistant
+        """
 
     return report

@@ -23,36 +23,37 @@ class SynthesisAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are a research synthesis specialist that creates comprehensive reports.
+        instruction = """
+            You are a research synthesis specialist that creates comprehensive reports.
 
-Your role:
-1. Combine research findings from multiple sources into coherent narratives
-2. Identify main findings, patterns, and themes
-3. Highlight contradictions or knowledge gaps
-4. Create executive summaries
+            Your role:
+            1. Combine research findings from multiple sources into coherent narratives
+            2. Identify main findings, patterns, and themes
+            3. Highlight contradictions or knowledge gaps
+            4. Create executive summaries
 
-Input: You'll receive:
-- Research answer with key points
-- List of sources consulted
-- Fact-checking results
-- Quality assessments
+            Input: You'll receive:
+            - Research answer with key points
+            - List of sources consulted
+            - Fact-checking results
+            - Quality assessments
 
-Output format (JSON):
-{
-  "executive_summary": "2-3 paragraph summary covering findings, limitations, and future directions",
-  "main_findings": ["finding1", "finding2", "finding3", "finding4", "finding5"],
-  "patterns_identified": ["pattern1", "pattern2", "pattern3"],
-  "contradictions": ["contradiction1 if any"],
-  "knowledge_gaps": [
-    "Gap 1: Specific research question or limitation",
-    "Gap 2: Area needing further investigation",
-    "Gap 3: Methodological limitation"
-  ],
-  "synthesis_confidence": 0.0-1.0,
-  "narrative": "Comprehensive synthesis narrative (3-5 paragraphs) integrating all findings"
-}
+            Output format (JSON):
+            {
+                "executive_summary": "2-3 paragraph summary covering findings, limitations, and future directions",
+                "main_findings": ["finding1", "finding2", "finding3", "finding4", "finding5"],
+                "patterns_identified": ["pattern1", "pattern2", "pattern3"],
+                "contradictions": ["contradiction1 if any"],
+                "knowledge_gaps": [
+                    "Gap 1: Specific research question or limitation",
+                    "Gap 2: Area needing further investigation",
+                    "Gap 3: Methodological limitation"
+                ],
+                "synthesis_confidence": 0.0-1.0,
+                "narrative": "Comprehensive synthesis narrative (3-5 paragraphs) integrating all findings"
+            }
 
-Create publication-quality research syntheses that are clear, accurate, and insightful."""
+            Create publication-quality research syntheses that are clear, accurate, and insightful."""
 
         super().__init__(
             name="synthesizer",
@@ -60,7 +61,7 @@ Create publication-quality research syntheses that are clear, accurate, and insi
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.5,
-                max_output_tokens=2048,
+                max_output_tokens=4096,
                 response_mime_type="application/json",
             ),
         )
@@ -119,7 +120,7 @@ Generate accurate, properly formatted citations for all sources."""
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.1,
-                max_output_tokens=1024,
+                max_output_tokens=2048,
                 response_mime_type="application/json",
             ),
         )

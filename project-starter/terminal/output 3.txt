@@ -1,0 +1,244 @@
+(venv) PS C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter> python .\main.py
+C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter\venv\Lib\site-packages\google\adk\features\_feature_decorator.py:72: UserWarning: [EXPERIMENTAL] feature FeatureName.PLUGGABLE_AUTH is enabled.
+  check_feature_enabled()
+
+================================================================================
+AI RESEARCH ASSISTANT
+================================================================================
+
+ Configuration:
+   Project ID: a4701101-u4773083-1774319820
+   Location: us-central1
+   Model: gemini-2.5-flash
+
+🔧 Initializing genai.Client...
+   Using Vertex AI authentication...
+   ✓ Client initialized with Vertex AI
+
+📝 Sample Research Queries:
+   1. Tell me about the history of the Python programming language, including evidences.
+   2. What are the health impacts of microplastics in marine ecosystems?
+   3. What are the latest advances in quantum computing error correction?
+   4. How does machine learning improve code review efficiency?
+   5. What are the latest types of computer memory?
+
+💡 To research a different topic:
+   • Edit queries list in main.py
+   • Or set RESEARCH_QUERY environment variable
+   • Example: export RESEARCH_QUERY='Your custom question here'
+
+🎯 Running research workflow for query 1...
+
+================================================================================
+AI RESEARCH ASSISTANT - EXECUTION
+================================================================================
+
+ Research Query: Tell me about the history of the Python programming language, including evidences.
+
+   Pattern: SequentialAgent
+
+   Execution: (ADK agents + agent.run_async())
+
+   Model: {model}
+
+--------------------------------------------------------------------------------
+STAGE 1: Domain Classification 
+--------------------------------------------------------------------------------
+   ✓ Domain: computer_science
+   ✓ Confidence: 0.98
+   ✓ Complexity: medium
+   ✓ Recommended sources: web, scholar, books
+
+--------------------------------------------------------------------------------
+STAGE 2: Source Gathering
+--------------------------------------------------------------------------------
+
+ Source Gathering: Tell me about the history of the Python programming language...
+   Pattern: ADK ParallelAgent + SequentialAgent
+   Created SequentialAgent: source_gathering_workflow
+   Type: SequentialAgent
+   Sub-agents: 2
+   Stage 1 (ParallelAgent): parallel_searches
+      → Type: ParallelAgent
+      → Sub-agents: 3 parallel searches
+   Stage 2 (Aggregator): source_aggregator
+
+   Executing workflow logic (execution)...
+
+   Stage 1: ParallelAgent (fan-out)
+      → web_search running...
+      ✓ web_search: Found 7 sources
+      ✓ web_search: Found 7 sources
+      → arxiv_search running...
+      → arxiv_search running...
+      ✓ arxiv_search: Found 7 sources
+      ✓ arxiv_search: Found 7 sources
+      → scholar_search running...
+      ✓ scholar_search: Found 7 sources
+
+   Stage 2: Aggregator (fan-in)
+      → source_aggregator aggregating results...
+      ✓ Total: 21 sources
+      ✓ Unique: 21 sources
+      ✓ Top sources: 0
+      ✓ Top sources: 0
+   ✅ Workflow execution completed
+   ✅ Workflow execution completed
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+STAGE 3: Research Refinement
+STAGE 3: Research Refinement
+--------------------------------------------------------------------------------
+
+ Research Loop: Tell me about the history of the Python programming language...
+   Max Iterations: 3
+   Created LoopAgent: research_refinement_loop
+   Type: LoopAgent
+   Sub-agents: 2 (researcher + critic)
+--------------------------------------------------------------------------------
+
+ Research Loop: Tell me about the history of the Python programming language...
+   Max Iterations: 3
+   Created LoopAgent: research_refinement_loop
+   Type: LoopAgent
+   Sub-agents: 2 (researcher + critic)
+ Research Loop: Tell me about the history of the Python programming language...
+   Max Iterations: 3
+   Created LoopAgent: research_refinement_loop
+   Type: LoopAgent
+   Sub-agents: 2 (researcher + critic)
+   Created LoopAgent: research_refinement_loop
+   Type: LoopAgent
+   Sub-agents: 2 (researcher + critic)
+
+
+   🔄 Executing LoopAgent logic (execution)...
+
+   🔄 Executing LoopAgent logic (execution)...
+
+   Iteration 1/3
+
+   Iteration 1/3
+   Iteration 1/3
+      → researcher generating answer...
+      → researcher generating answer...
+      ✓ Answer generated (confidence: high)
+      ✓ Answer generated (confidence: high)
+      → critic evaluating quality...
+      ✓ Quality: needs_improvement (score: 0.50)
+      Quality below threshold - Continue refining...
+      Feedback: Unable to parse evaluation...
+
+   Iteration 2/3
+      → researcher generating answer...
+      ✓ Answer generated (confidence: high)
+      → critic evaluating quality...
+      ✓ Quality: needs_improvement (score: 0.50)
+      Quality below threshold - Continue refining...
+      Feedback: Unable to parse evaluation...
+
+   Iteration 3/3
+      → researcher generating answer...
+      ✓ Answer generated (confidence: high)
+      → critic evaluating quality...
+      ✓ Quality: needs_improvement (score: 0.50)
+      Quality below threshold - Continue refining...
+
+   Max iterations reached - Returning best attempt
+   LoopAgent execution completed (3 iterations)
+
+--------------------------------------------------------------------------------
+STAGE 4: Fact Checking (LlmAgent)
+--------------------------------------------------------------------------------
+   ✓ Credibility Score: 0.50
+   ✓ Verified Claims: 0
+   ✓ Questionable Claims: 0
+
+--------------------------------------------------------------------------------
+STAGE 5: Synthesis (LlmAgent)
+--------------------------------------------------------------------------------
+   ✓ Synthesis completed
+   ✓ Key Insights: 4
+   ✓ Themes: 0
+   ✓ Coherence Score: 0.50
+
+--------------------------------------------------------------------------------
+STAGE 6: Citation Generation (LlmAgent)
+--------------------------------------------------------------------------------
+   ✓ Citations formatted
+   ✓ Total Citations: 0
+   ✓ Style: APA
+
+================================================================================
+WORKFLOW COMPLETED
+================================================================================
+
+  All 7 stages executed successfully
+  Results Summary:
+   • Query: Tell me about the history of the Python programming language, including evidences.
+   • Domain: computer_science
+   • Sources Found: 21
+   • Research Iterations: 3
+   • Credibility Score: 0.50
+   • Citations: 0
+  Execution Method:
+   ✓ All agents inherit from ADK base classes
+   ✓ Executed via agent.run_async() with genai.Client
+   ✓ No ADK server deployment required
+   ✓ Real LLM output from Vertex AI Gemini
+
+--------------------------------------------------------------------------------
+STAGE 7: Performance Evaluation
+--------------------------------------------------------------------------------
+   ✓ Execution Time: 130.04s
+   ✓ Performance Score: 0.50
+   ✓ Health Status: needs_improvement
+   ✓ Queries Processed: 1
+   ⚠️  Bottlenecks Identified:
+      • Low quality scores - consider adjusting prompts or increasing iterations
+      • Slow response times - optimize source gathering
+
+📄 Generating research report...
+   ✓ Report saved to: C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter\docs/research_report.md
+
+================================================================================
+RESEARCH REPORT PREVIEW
+================================================================================
+
+        # Research Report: Tell me about the history of the Python programming language, including evidences.
+
+        ## Executive Summary
+        Synthesis failed
+
+        **Domain:** computer_science
+        **Credibility Score:** 0.50/1.00
+        **Sources Consulted:** 21
+        **Research Iterations:** 3
+
+        ---
+
+        ## Research Findings
+
+        The Python programming language was conceived in the late 1980s by Guido van Rossum at the Centrum Wiskunde & Informatica (CWI) in the Netherlands, as a successor to the ABC language. Van Rossum began implementing Python in December 1989, and the first public release, Python 0.9.0, occurred in February 1991. His primary goal was to create a language that was easy to read and write, emphasizing code readability through its clean syntax and significant whitespace indentation. Python was designed to be a general-purpose, high-level language, incorporating features from various programming paradigms, including object-oriented, imperative, and functional programming.
+
+Key developments include the release of Python 1.0 in January 1994, which added features like `lambda`, `map`, `filter`, and `reduce`. Python 2.0, released in October 2000, introduced list comprehensions, a full garbage collector, and enhanced Unicode support. This version marked a significant growth in Python's popularity, especially in web development and system administration. The most impactful shift came with Python 3.0 (also known as 'Python 3000' or 'Py3k'), released in December 2008. Python 3.0 was a backward-incompatible release, meaning much of the code written for Python 2.x would not run on Python 3.x without modification. Major changes included the `print` statement becoming a `print()` function, improved Unicode handling by making strings Unicode by default, and changes to integer division. This transition period was lengthy and challenging, but Python 3.x eventually became the dominant version, with Python 2.x officially reaching its
+
+... (report continues, total 5669 characters)
+
+Full report saved to: C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter\docs/research_report.md
+
+================================================================================
+EXECUTION SUMMARY
+================================================================================
+
+  Workflow Metrics:
+   • Total Stages: 6
+   • Research Iterations: 3
+   • Sources Found: 21
+   • Credibility Score: 0.50
+   • Citations: 0
+
+ Execution successful!
+(venv) PS C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter>  

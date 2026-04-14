@@ -14,34 +14,35 @@ class DomainClassifierAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are a research query classification specialist.
+        instruction = """
+            You are a research query classification specialist.
 
-Your role:
-1. Classify research queries into appropriate domains
-2. Provide confidence scores for classification
-3. Analyze query complexity
-4. Recommend appropriate sources
+            Your role:
+            1. Classify research queries into appropriate domains
+            2. Provide confidence scores for classification
+            3. Analyze query complexity
+            4. Recommend appropriate sources
 
-Supported domains:
-- computer_science
-- biology
-- physics
-- chemistry
-- medicine
-- mathematics
-- engineering
-- social_science
-- general
+            Supported domains:
+            - computer_science
+            - biology
+            - physics
+            - chemistry
+            - medicine
+            - mathematics
+            - engineering
+            - social_science
+            - general
 
-Output format (JSON):
-{
-  "domain": "computer_science",
-  "confidence": 0.95,
-  "complexity": "medium/high/low",
-  "reasoning": "Brief explanation of classification",
-  "recommended_sources": ["web", "arxiv", "scholar"],
-  "keywords": ["key1", "key2", "key3"]
-}"""
+            Output format (JSON):
+            {
+                "domain": "computer_science",
+                "confidence": 0.95,
+                "complexity": "medium/high/low",
+                "reasoning": "Brief explanation of classification",
+                "recommended_sources": ["web", "arxiv", "scholar"],
+                "keywords": ["key1", "key2", "key3"]
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -102,23 +103,24 @@ class FactCheckAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are a research fact-checking specialist.
+        instruction = """
+            You are a research fact-checking specialist.
 
-Your role:
-1. Verify claims against your knowledge
-2. Identify potentially inaccurate or unsupported statements
-3. Assess overall credibility
-4. Provide verification notes
+            Your role:
+            1. Verify claims against your knowledge
+            2. Identify potentially inaccurate or unsupported statements
+            3. Assess overall credibility
+            4. Provide verification notes
 
-Output format (JSON):
-{
-  "verified_claims": ["List of verified statements"],
-  "questionable_claims": ["List of claims needing verification"],
-  "credibility_score": 0.85,
-  "verification_notes": "Brief notes on verification process",
-  "sources_checked": ["List of knowledge sources validated against"],
-  "recommendations": ["Suggestions for strengthening claims"]
-}"""
+            Output format (JSON):
+            {
+                "verified_claims": ["List of verified statements"],
+                "questionable_claims": ["List of claims needing verification"],
+                "credibility_score": 0.85,
+                "verification_notes": "Brief notes on verification process",
+                "sources_checked": ["List of knowledge sources validated against"],
+                "recommendations": ["Suggestions for strengthening claims"]
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -136,7 +138,7 @@ Output format (JSON):
         self,
         client: genai.Client,
         answer: Dict[str, Any],
-        sources: Dict[str, Any] = None,
+        sources: Dict[str, Any] = None, # type: ignore
     ) -> Dict[str, Any]:
         """Fact-check research answer using direct genai.Client call.
 
@@ -150,11 +152,12 @@ Output format (JSON):
         """
         prompt = f"""{self.instruction}
 
-user: Please fact-check this research answer:
+            user: Please fact-check this research answer:
 
-Answer: {answer.get('answer', 'No answer provided')}
-Key Points: {json.dumps(answer.get('key_points', []))}
-"""
+            Answer: {answer.get('answer', 'No answer provided')}
+            Key Points: {json.dumps(answer.get('key_points', []))}
+            """
+
         if sources:
             prompt += f"\nSources mentioned: {json.dumps(sources.get('aggregated_sources', {}).get('top_sources', [])[:5], indent=2)}"
 
@@ -190,24 +193,25 @@ class SynthesisAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are a research synthesis specialist.
+        instruction = """
+            You are a research synthesis specialist.
 
-Your role:
-1. Combine findings from multiple sources
-2. Create coherent narrative structure
-3. Identify key themes and insights
-4. Maintain academic tone
-5. Provide actionable recommendations
+            Your role:
+            1. Combine findings from multiple sources
+            2. Create coherent narrative structure
+            3. Identify key themes and insights
+            4. Maintain academic tone
+            5. Provide actionable recommendations
 
-Output format (JSON):
-{
-  "synthesis": "Comprehensive narrative combining all findings (3-5 paragraphs)",
-  "key_insights": ["Main insight 1", "Main insight 2", "Main insight 3"],
-  "themes": ["Major theme 1", "Major theme 2"],
-  "recommendations": ["Actionable recommendation 1", "Actionable recommendation 2"],
-  "coherence_score": 0.9,
-  "executive_summary": "1-2 sentence summary"
-}"""
+            Output format (JSON):
+            {
+                "synthesis": "Comprehensive narrative combining all findings (3-5 paragraphs)",
+                "key_insights": ["Main insight 1", "Main insight 2", "Main insight 3"],
+                "themes": ["Major theme 1", "Major theme 2"],
+                "recommendations": ["Actionable recommendation 1", "Actionable recommendation 2"],
+                "coherence_score": 0.9,
+                "executive_summary": "1-2 sentence summary"
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -243,17 +247,17 @@ Output format (JSON):
         """
         prompt = f"""{self.instruction}
 
-user: Synthesize these research findings:
+            user: Synthesize these research findings:
 
-Question: {query}
+            Question: {query}
 
-Answer: {answer.get('answer', 'No answer')}
+            Answer: {answer.get('answer', 'No answer')}
 
-Key Points: {json.dumps(answer.get('key_points', []))}
+            Key Points: {json.dumps(answer.get('key_points', []))}
 
-Credibility: {fact_check.get('credibility_score', 0.5)}
+            Credibility: {fact_check.get('credibility_score', 0.5)}
 
-Top Sources: {len(sources.get('aggregated_sources', {}).get('top_sources', []))} sources available"""
+            Top Sources: {len(sources.get('aggregated_sources', {}).get('top_sources', []))} sources available"""
 
         response = client.models.generate_content(
             model=self.model, contents=prompt, config=self.generate_content_config
@@ -287,27 +291,28 @@ class CitationAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are an academic citation specialist.
+        instruction = """
+            You are an academic citation specialist.
 
-Your role:
-1. Format citations in standard academic styles
-2. Generate bibliography
-3. Ensure proper attribution
+            Your role:
+            1. Format citations in standard academic styles
+            2. Generate bibliography
+            3. Ensure proper attribution
 
-Output format (JSON):
-{
-  "citations": [
-    {
-      "source_title": "Source title",
-      "citation_apa": "APA formatted citation",
-      "citation_mla": "MLA formatted citation",
-      "citation_number": 1
-    }
-  ],
-  "bibliography": "Complete bibliography in APA format",
-  "total_citations": 10,
-  "citation_style": "APA"
-}"""
+            Output format (JSON):
+            {
+                "citations": [
+                    {
+                    "source_title": "Source title",
+                    "citation_apa": "APA formatted citation",
+                    "citation_mla": "MLA formatted citation",
+                    "citation_number": 1
+                    }
+                ],
+                "bibliography": "Complete bibliography in APA format",
+                "total_citations": 10,
+                "citation_style": "APA"
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -316,7 +321,7 @@ Output format (JSON):
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.1,
-                max_output_tokens=1536,
+                max_output_tokens=4096,
                 response_mime_type="application/json",
             ),
         )
@@ -337,9 +342,9 @@ Output format (JSON):
 
         prompt = f"""{self.instruction}
 
-user: Generate citations for these sources:
+            user: Generate citations for these sources:
 
-{json.dumps(top_sources[:10], indent=2)}"""
+            {json.dumps(top_sources[:10], indent=2)}"""
 
         response = client.models.generate_content(
             model=self.model, contents=prompt, config=self.generate_content_config

@@ -44,15 +44,15 @@ class DomainClassifierAgent(LlmAgent):
             - high: Deep analysis, cutting-edge research, or complex synthesis
 
             Output format (JSON):
-                {
-                    "domain": "primary_domain",
-                    "confidence": 0.0-1.0,
-                    "complexity": "low/moderate/high",
-                    "reasoning": "Why this domain was selected",
-                    "alternative_domains": ["backup1", "backup2"],
-                    "recommended_sources": ["web", "arxiv", "scholar"],
-                    "specialist_agent": "domain_name_specialist"
-                }
+            {
+                "domain": "primary_domain",
+                "confidence": 0.0-1.0,
+                "complexity": "low/moderate/high",
+                "reasoning": "Why this domain was selected",
+                "alternative_domains": ["backup1", "backup2"],
+                "recommended_sources": ["web", "arxiv", "scholar"],
+                "specialist_agent": "domain_name_specialist"
+            }
 
             Confidence guidelines:
             - >0.9: Very clear domain match
@@ -62,15 +62,30 @@ class DomainClassifierAgent(LlmAgent):
 
             Be precise in classification but acknowledge uncertainty when present."""
 
-        # TODO 5: Initialize LlmAgent for domain classification
-
-        pass  # REPLACE THIS LINE: Initialize LlmAgent with super().__init__() here
+        # Completed: Initialize LlmAgent for domain classification
+        #
+        # Mirrors QueryComplexityAgent's pattern but tuned for classification:
+        # - Low temperature (0.1) for deterministic, consistent domain routing —
+        #   the same query should always map to the same domain.
+        # - Compact token budget (512) since the structured JSON output is small.
+        # - JSON mime type enforces the structured output contract used by
+        #   downstream routing logic that reads "domain" and "confidence".
+ 
+        super().__init__(
+            name="domain_classifier",
+            model=model,
+            instruction=instruction,
+            generate_content_config=GenerateContentConfig(
+                temperature=0.1,
+                max_output_tokens=512,
+                response_mime_type="application/json",
+            ),
+        )
 
 
 class QueryComplexityAgent(LlmAgent):
     """
     Assesses query complexity for resource allocation.
-
     """
 
     def __init__(self, model: str = "gemini-2.5-flash"):
@@ -79,37 +94,38 @@ class QueryComplexityAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are a query complexity assessment specialist.
+        instruction = """
+            You are a query complexity assessment specialist.
 
-Your role:
-1. Analyze the depth and breadth of research queries
-2. Estimate the resources needed to answer thoroughly
-3. Recommend processing strategies based on complexity
+            Your role:
+            1. Analyze the depth and breadth of research queries
+            2. Estimate the resources needed to answer thoroughly
+            3. Recommend processing strategies based on complexity
 
-Complexity factors:
-- Scope: Narrow topic vs. broad synthesis
-- Depth: Surface-level vs. cutting-edge research
-- Interdisciplinarity: Single field vs. multiple domains
-- Recency: Historical vs. latest developments
-- Specificity: General overview vs. specific techniques
+            Complexity factors:
+            - Scope: Narrow topic vs. broad synthesis
+            - Depth: Surface-level vs. cutting-edge research
+            - Interdisciplinarity: Single field vs. multiple domains
+            - Recency: Historical vs. latest developments
+            - Specificity: General overview vs. specific techniques
 
-Output format (JSON):
-{
-  "complexity_score": 0.0-1.0,
-  "complexity_level": "low/moderate/high",
-  "factors": {
-    "scope": "narrow/moderate/broad",
-    "depth": "surface/moderate/deep",
-    "interdisciplinary": true/false,
-    "recency_required": true/false,
-    "specificity": "general/moderate/specific"
-  },
-  "recommended_strategy": "Strategy description",
-  "estimated_sources_needed": 10,
-  "suggested_iterations": 2
-}
+            Output format (JSON):
+            {
+                "complexity_score": 0.0-1.0,
+                "complexity_level": "low/moderate/high",
+                "factors": {
+                    "scope": "narrow/moderate/broad",
+                    "depth": "surface/moderate/deep",
+                    "interdisciplinary": true/false,
+                    "recency_required": true/false,
+                    "specificity": "general/moderate/specific"
+                },
+                "recommended_strategy": "Strategy description",
+                "estimated_sources_needed": 10,
+                "suggested_iterations": 2
+            }
 
-Use this to help allocate appropriate resources for each query."""
+            Use this to help allocate appropriate resources for each query."""
 
         super().__init__(
             name="complexity_assessor",
@@ -117,7 +133,7 @@ Use this to help allocate appropriate resources for each query."""
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.2,
-                max_output_tokens=384,
+                max_output_tokens=512,
                 response_mime_type="application/json",
             ),
         )

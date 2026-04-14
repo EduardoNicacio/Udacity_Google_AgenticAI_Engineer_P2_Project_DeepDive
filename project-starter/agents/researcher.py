@@ -17,25 +17,26 @@ class ResearcherAgent(LlmAgent):
         Args:
             model: Gemini model name
         """
-        instruction = """You are a research assistant that answers questions accurately and thoroughly.
+        instruction = """
+            You are a research assistant that answers questions accurately and thoroughly.
 
-Your role:
-1. Answer the research question clearly and comprehensively
-2. If you receive feedback from the critic, improve your previous answer addressing all concerns
-3. Cite reasoning and provide evidence where possible
-4. Include 3-5 key points with supporting details
-5. Mention relevant sources or areas of research
+            Your role:
+            1. Answer the research question clearly and comprehensively
+            2. If you receive feedback from the critic, improve your previous answer addressing all concerns
+            3. Cite reasoning and provide evidence where possible
+            4. Include 3-5 key points with supporting details
+            5. Mention relevant sources or areas of research
 
-Output format (JSON):
-{
-  "answer": "Your comprehensive answer here with evidence and reasoning",
-  "key_points": ["point1 with evidence", "point2 with evidence", "point3 with evidence"],
-  "sources_mentioned": ["source1", "source2", "source3"],
-  "confidence": "high/medium/low",
-  "iteration_notes": "What you improved this iteration (if applicable)"
-}
+            Output format (JSON):
+            {
+                "answer": "Your comprehensive answer here with evidence and reasoning",
+                "key_points": ["point1 with evidence", "point2 with evidence", "point3 with evidence"],
+                "sources_mentioned": ["source1", "source2", "source3"],
+                "confidence": "high/medium/low",
+                "iteration_notes": "What you improved this iteration (if applicable)"
+            }
 
-Focus on accuracy, clarity, and continuous improvement. Each iteration should show measurable progress."""
+            Focus on accuracy, clarity, and continuous improvement. Each iteration should show measurable progress."""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -44,7 +45,7 @@ Focus on accuracy, clarity, and continuous improvement. Each iteration should sh
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.7,
-                max_output_tokens=1024,
+                max_output_tokens=4096,
                 response_mime_type="application/json",
             ),
         )
@@ -169,7 +170,7 @@ class ResearchCriticAgent(LlmAgent):
         """
         prompt = f"""{self.instruction}
 
-            User: Please evaluate this research answer:
+            user: Please evaluate this research answer:
 
             Question: {question}
 
@@ -215,21 +216,25 @@ def create_research_loop_agent(
     Returns:
         LoopAgent configured for research refinement
     """
-    # TODO 1: Create the two agents for the LoopAgent
+    # Completed: Create the two agents for the LoopAgent
     #
     # Create the generator and validator agents:
     # - ResearcherAgent: The generator that creates/improves answers
     # - ResearchCriticAgent: The validator that evaluates quality
 
-    researcher = None  # REPLACE: Create ResearcherAgent here
-    critic = None  # REPLACE: Create ResearchCriticAgent here
+    researcher = ResearcherAgent(model=model)
+    critic = ResearchCriticAgent(model=model)
 
-    # TODO 2: Compose agents into LoopAgent
+    # Completed: Compose agents into LoopAgent
     #
     # Create a LoopAgent that will run the researcher and critic iteratively.
     #
 
-    refinement_loop = None  # REPLACE: Create LoopAgent here
+    refinement_loop = LoopAgent(
+        name="research_refinement_loop",
+        sub_agents=[researcher, critic],
+        max_iterations=max_iterations,
+    )
 
     return refinement_loop
 
@@ -266,7 +271,7 @@ async def execute_research_loop(
     researcher = loop_agent.sub_agents[0]
     critic = loop_agent.sub_agents[1]
 
-    print(f"\n   🔄 Executing LoopAgent logic (execution)...")
+    print("\n   🔄 Executing LoopAgent logic (execution)...")
 
     # Manually execute the loop logic (part - can't use ADK deployment)
     context = []
@@ -313,11 +318,11 @@ async def execute_research_loop(
 
         # Check termination (mimics ADK LoopAgent escalate logic)
         if should_stop:
-            print(f"      Quality threshold met - Loop terminated")
+            print("      Quality threshold met - Loop terminated")
             final_answer = answer
             break
         else:
-            print(f"      Quality below threshold - Continue refining...")
+            print("      Quality below threshold - Continue refining...")
             if iteration < max_iterations:
                 print(
                     f"      Feedback: {evaluation.get('feedback', 'No feedback')[:80]}..."
@@ -325,7 +330,7 @@ async def execute_research_loop(
 
     # If loop exhausted without should_stop
     if not final_answer:
-        print(f"\n   Max iterations reached - Returning best attempt")
+        print("\n   Max iterations reached - Returning best attempt")
         final_answer = iteration_history[-1]["answer"] if iteration_history else {}
 
     print(f"   LoopAgent execution completed ({len(iteration_history)} iterations)")

@@ -12,13 +12,13 @@ async def main():
     print("AI RESEARCH ASSISTANT")
     print("="*80)
   
-    print(f"\n Configuration:")
+    print("\n Configuration:")
     print(f"   Project ID: {config.project_id or 'NOT SET'}")
     print(f"   Location: {config.location}")
     print(f"   Model: {config.model_name}")
 
     # Initialize genai client
-    print(f"\n🔧 Initializing genai.Client...")
+    print("\n🔧 Initializing genai.Client...")
 
     # Try multiple authentication methods (easiest to hardest for students)
     api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
@@ -26,18 +26,18 @@ async def main():
     try:
         if api_key:
             # Method 1: API Key (EASIEST for students!)
-            print(f"   Using Gemini API key authentication...")
+            print("   Using Gemini API key authentication...")
             client = genai.Client(api_key=api_key)
-            print(f"   ✓ Client initialized with API key")
+            print("   ✓ Client initialized with API key")
         elif config.project_id:
             # Method 2: Vertex AI (requires gcloud or service account)
-            print(f"   Using Vertex AI authentication...")
+            print("   Using Vertex AI authentication...")
             client = genai.Client(
                 vertexai=True,
                 project=config.project_id,
                 location=config.location
             )
-            print(f"   ✓ Client initialized with Vertex AI")
+            print("   ✓ Client initialized with Vertex AI")
         else:
             print("\n❌ No authentication method available")
             return
@@ -47,32 +47,33 @@ async def main():
 
     # Sample research queries
     queries = [
+        "Tell me about the history of the Python programming language, including evidences.",
+        "What are the health impacts of microplastics in marine ecosystems?",
         "What are the latest advances in quantum computing error correction?",
         "How does machine learning improve code review efficiency?",
-        "What are the health impacts of microplastics in marine ecosystems?",
         "What are the latest types of computer memory?"
     ]
 
-    print(f"\n📝 Sample Research Queries:")
+    print("\n📝 Sample Research Queries:")
     for i, q in enumerate(queries, 1):
         print(f"   {i}. {q}")
 
     # Allow user to select query or provide custom one
-    print(f"\n💡 To research a different topic:")
-    print(f"   • Edit queries list in main.py")
-    print(f"   • Or set RESEARCH_QUERY environment variable")
-    print(f"   • Example: export RESEARCH_QUERY='Your custom question here'")
+    print("\n💡 To research a different topic:")
+    print("   • Edit queries list in main.py")
+    print("   • Or set RESEARCH_QUERY environment variable")
+    print("   • Example: export RESEARCH_QUERY='Your custom question here'")
 
     # Check for custom query via environment variable
     custom_query = os.getenv("RESEARCH_QUERY")
 
     if custom_query:
         selected_query = custom_query
-        print(f"\n🎯 Running custom research query...")
+        print("\n🎯 Running custom research query...")
     else:
         # Select query (default to first one)
         selected_query = queries[0]
-        print(f"\n🎯 Running research workflow for query 1...")
+        print("\n🎯 Running research workflow for query 1...")
 
     # Execute complete workflow
     try:
@@ -84,12 +85,12 @@ async def main():
         )
 
         # Generate formatted report
-        print(f"\n📄 Generating research report...")
+        print("\n📄 Generating research report...")
         report = generate_research_report(workflow_results)
 
         # Save report
-        report_file = os.path.join(os.path.dirname(__file__), "research_report.md")
-        with open(report_file, 'w') as f:
+        report_file = os.path.join(os.path.dirname(__file__), "docs/research_report.md")
+        with open(report_file, 'w', encoding="UTF-8") as f:
             f.write(report)
 
         print(f"   ✓ Report saved to: {report_file}")
@@ -107,14 +108,14 @@ async def main():
         print("\n" + "="*80)
         print("EXECUTION SUMMARY")
         print("="*80)
-        print(f"\n  Workflow Metrics:")
-        print(f"   • Total Stages: 6")
+        print("\n  Workflow Metrics:")
+        print("   • Total Stages: 6")
         print(f"   • Research Iterations: {workflow_results['stage_3_research']['iterations_run']}")
         print(f"   • Sources Found: {workflow_results['stage_2_sources']['aggregated_sources'].get('total_sources', 0)}")
         print(f"   • Credibility Score: {workflow_results['stage_4_fact_check'].get('credibility_score', 0):.2f}")
         print(f"   • Citations: {workflow_results['stage_6_citations'].get('total_citations', 0)}")
 
-        print(f"\n Execution successful!")
+        print("\n Execution successful!")
        
     except Exception as e:
         print(f"\n❌ Error executing workflow: {e}")

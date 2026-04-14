@@ -10,29 +10,30 @@ class WebSearchAgent(LlmAgent):
     """Simulates web search using LLM (ADK LlmAgent)."""
 
     def __init__(self, model: str = "gemini-2.5-flash"):
-        instruction = """You are a web search specialist that finds relevant online sources.
+        instruction = """
+            You are a web search specialist that finds relevant online sources.
 
-Generate 5-10 realistic web search results with:
-- Diverse source types (blogs, documentation, news, tutorials, forums)
-- Authentic-looking titles and URLs
-- Relevant 2-3 sentence snippets
-- Relevance scores (0-1)
+            Generate 5-10 realistic web search results with:
+            - Diverse source types (blogs, documentation, news, tutorials, forums)
+            - Authentic-looking titles and URLs
+            - Relevant 2-3 sentence snippets
+            - Relevance scores (0-1)
 
-Output format (JSON):
-{
-  "source_type": "web",
-  "results": [
-    {
-      "title": "Descriptive article title",
-      "url": "https://example.com/realistic-url",
-      "snippet": "2-3 sentence preview that's relevant to the query",
-      "relevance": 0.95,
-      "source": "website name"
-    }
-  ],
-  "total_found": 10,
-  "search_time": 0.5
-}"""
+            Output format (JSON):
+            {
+                "source_type": "web",
+                "results": [
+                    {
+                    "title": "Descriptive article title",
+                    "url": "https://example.com/realistic-url",
+                    "snippet": "2-3 sentence preview that's relevant to the query",
+                    "relevance": 0.95,
+                    "source": "website name"
+                    }
+                ],
+                "total_found": 10,
+                "search_time": 0.5
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -41,7 +42,7 @@ Output format (JSON):
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.8,
-                max_output_tokens=1024,
+                max_output_tokens=4096,
                 response_mime_type="application/json",
             ),
         )
@@ -76,31 +77,32 @@ class ArxivSearchAgent(LlmAgent):
     """Simulates arXiv academic paper search using LLM (ADK LlmAgent)."""
 
     def __init__(self, model: str = "gemini-2.5-flash"):
-        instruction = """You are an arXiv academic paper search specialist.
+        instruction = """
+            You are an arXiv academic paper search specialist.
 
-Generate 5-8 realistic arXiv papers with:
-- Academic paper titles
-- Realistic author names
-- arXiv URLs (https://arxiv.org/abs/YYMM.NNNNN format)
-- 3-5 sentence abstracts
-- Publication dates (recent, within last 2-3 years)
+            Generate 5-8 realistic arXiv papers with:
+            - Academic paper titles
+            - Realistic author names
+            - arXiv URLs (https://arxiv.org/abs/YYMM.NNNNN format)
+            - 3-5 sentence abstracts
+            - Publication dates (recent, within last 2-3 years)
 
-Output format (JSON):
-{
-  "source_type": "arxiv",
-  "results": [
-    {
-      "title": "Academic Paper Title: Subtitle",
-      "authors": ["FirstName LastName", "FirstName LastName"],
-      "url": "https://arxiv.org/abs/2401.12345",
-      "abstract": "3-5 sentence academic abstract describing the research",
-      "published": "2024-01-15",
-      "relevance": 0.92
-    }
-  ],
-  "total_found": 8,
-  "search_time": 0.3
-}"""
+            Output format (JSON):
+            {
+                "source_type": "arxiv",
+                "results": [
+                    {
+                    "title": "Academic Paper Title: Subtitle",
+                    "authors": ["FirstName LastName", "FirstName LastName"],
+                    "url": "https://arxiv.org/abs/2401.12345",
+                    "abstract": "3-5 sentence academic abstract describing the research",
+                    "published": "2024-01-15",
+                    "relevance": 0.92
+                    }
+                ],
+                "total_found": 8,
+                "search_time": 0.3
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -109,7 +111,7 @@ Output format (JSON):
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.8,
-                max_output_tokens=1024,
+                max_output_tokens=4096,
                 response_mime_type="application/json",
             ),
         )
@@ -144,33 +146,34 @@ class ScholarSearchAgent(LlmAgent):
     """Simulates Google Scholar academic search using LLM (ADK LlmAgent)."""
 
     def __init__(self, model: str = "gemini-2.5-flash"):
-        instruction = """You are a Google Scholar search specialist.
+        instruction = """
+            You are a Google Scholar search specialist.
 
-Generate 5-8 realistic academic publications with:
-- Academic titles (papers, theses, books)
-- Author lists
-- Publication venues (journals, conferences)
-- Years and citation counts
-- Brief descriptions
+            Generate 5-8 realistic academic publications with:
+            - Academic titles (papers, theses, books)
+            - Author lists
+            - Publication venues (journals, conferences)
+            - Years and citation counts
+            - Brief descriptions
 
-Output format (JSON):
-{
-  "source_type": "scholar",
-  "results": [
-    {
-      "title": "Academic Publication Title",
-      "authors": ["Author1", "Author2", "Author3"],
-      "venue": "Journal of Computer Science / Conference Name",
-      "year": 2024,
-      "url": "https://scholar.google.com/citations?id=example",
-      "snippet": "2-3 sentence description of the work",
-      "citations": 45,
-      "relevance": 0.88
-    }
-  ],
-  "total_found": 8,
-  "search_time": 0.4
-}"""
+            Output format (JSON):
+            {
+                "source_type": "scholar",
+                "results": [
+                    {
+                    "title": "Academic Publication Title",
+                    "authors": ["Author1", "Author2", "Author3"],
+                    "venue": "Journal of Computer Science / Conference Name",
+                    "year": 2024,
+                    "url": "https://scholar.google.com/citations?id=example",
+                    "snippet": "2-3 sentence description of the work",
+                    "citations": 45,
+                    "relevance": 0.88
+                    }
+                ],
+                "total_found": 8,
+                "search_time": 0.4
+            }"""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -179,7 +182,7 @@ Output format (JSON):
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.8,
-                max_output_tokens=1024,
+                max_output_tokens=4096,
                 response_mime_type="application/json",
             ),
         )
@@ -215,36 +218,37 @@ class SourceAggregatorAgent(LlmAgent):
 
     def __init__(self, model: str = "gemini-2.5-flash"):
         """Initialize aggregator agent."""
-        instruction = """You are a source aggregation specialist.
+        instruction = """
+            You are a source aggregation specialist.
 
-Your role:
-1. Combine search results from multiple sources (web, arXiv, Google Scholar)
-2. Remove duplicates
-3. Rank by relevance
-4. Provide summary statistics
+            Your role:
+            1. Combine search results from multiple sources (web, arXiv, Google Scholar)
+            2. Remove duplicates
+            3. Rank by relevance
+            4. Provide summary statistics
 
-Output format (JSON):
-{
-  "total_sources": 30,
-  "unique_sources": 25,
-  "top_sources": [
-    {
-      "title": "Source title",
-      "type": "web/arxiv/scholar",
-      "url": "https://...",
-      "relevance_score": 0.95,
-      "snippet": "Brief description"
-    }
-  ],
-  "sources_by_type": {
-    "web": 10,
-    "arxiv": 8,
-    "scholar": 7
-  },
-  "aggregation_summary": "Brief summary of source quality and diversity"
-}
+            Output format (JSON):
+            {
+                "total_sources": 30,
+                "unique_sources": 25,
+                "top_sources": [
+                    {
+                    "title": "Source title",
+                    "type": "web/arxiv/scholar",
+                    "url": "https://...",
+                    "relevance_score": 0.95,
+                    "snippet": "Brief description"
+                    }
+                ],
+                "sources_by_type": {
+                    "web": 10,
+                    "arxiv": 8,
+                    "scholar": 7
+                },
+                "aggregation_summary": "Brief summary of source quality and diversity"
+            }
 
-Select the top 10-15 most relevant sources."""
+            Select the top 10-15 most relevant sources."""
 
         # Initialize ADK LlmAgent
         super().__init__(
@@ -253,7 +257,7 @@ Select the top 10-15 most relevant sources."""
             instruction=instruction,
             generate_content_config=GenerateContentConfig(
                 temperature=0.3,
-                max_output_tokens=2048,
+                max_output_tokens=8192,
                 response_mime_type="application/json",
             ),
         )
@@ -264,9 +268,9 @@ Select the top 10-15 most relevant sources."""
         """Aggregate results from multiple searches using direct genai.Client call (execution)."""
         prompt = f"""{self.instruction}
 
-user: Please aggregate these search results:
+            user: Please aggregate these search results:
 
-{json.dumps(search_results, indent=2)}"""
+            {json.dumps(search_results, indent=2)}"""
 
         response = client.models.generate_content(
             model=self.model, contents=prompt, config=self.generate_content_config
@@ -310,20 +314,26 @@ def create_source_gathering_workflow(
     scholar_search = ScholarSearchAgent(model=model)
     aggregator = SourceAggregatorAgent(model=model)
 
-    # TODO 3: Create ParallelAgent for concurrent searches
+    # Completed: Create ParallelAgent for concurrent searches
     #
     # Create a ParallelAgent that runs all three search agents concurrently.
     # This is the "fan-out" part of the fan-out/fan-in pattern.
 
-    parallel_searches = None  # REPLACE: Create ParallelAgent here
+    parallel_searches = ParallelAgent(
+        name="parallel_searches",
+        sub_agents=[web_search, arxiv_search, scholar_search],
+    )
 
-    # TODO 4: Wrap with SequentialAgent
+    # Completed: Wrap with SequentialAgent
     #
     # Create a SequentialAgent that orchestrates the workflow:
     # 1. First runs the ParallelAgent (fan-out: all searches run concurrently)
     # 2. Then runs the aggregator (fan-in: combines all results)
 
-    source_gathering_workflow = None  # REPLACE: Create SequentialAgent here
+    source_gathering_workflow = SequentialAgent(
+        name="source_gathering_workflow",
+        sub_agents=[parallel_searches, aggregator],
+    )
 
     return source_gathering_workflow
 
@@ -348,7 +358,7 @@ async def execute_source_gathering(
         Dictionary with aggregated sources
     """
     print(f"\n Source Gathering: {query[:60]}...")
-    print(f"   Pattern: ADK ParallelAgent + SequentialAgent")
+    print("   Pattern: ADK ParallelAgent + SequentialAgent")
 
     # Create SequentialAgent with ParallelAgent
     workflow = create_source_gathering_workflow(model=model)
@@ -368,10 +378,10 @@ async def execute_source_gathering(
     print(f"   Stage 2 (Aggregator): {aggregator.name}")
 
     # Manually execute the workflow logic
-    print(f"\n   Executing workflow logic (execution)...")
+    print("\n   Executing workflow logic (execution)...")
 
     # STAGE 1: Execute parallel searches (fan-out)
-    print(f"\n   Stage 1: ParallelAgent (fan-out)")
+    print("\n   Stage 1: ParallelAgent (fan-out)")
 
     web_search = parallel_stage.sub_agents[0]
     arxiv_search = parallel_stage.sub_agents[1]
@@ -405,7 +415,7 @@ async def execute_source_gathering(
     search_results = await asyncio.gather(run_web(), run_arxiv(), run_scholar())
 
     # STAGE 2: Aggregate results (fan-in)
-    print(f"\n   Stage 2: Aggregator (fan-in)")
+    print("\n   Stage 2: Aggregator (fan-in)")
     print(f"      → {aggregator.name} aggregating results...")
 
     aggregated = aggregator.aggregate(client, list(search_results))
@@ -414,7 +424,7 @@ async def execute_source_gathering(
     print(f"      ✓ Unique: {aggregated.get('unique_sources', 0)} sources")
     print(f"      ✓ Top sources: {len(aggregated.get('top_sources', []))}")
 
-    print(f"   ✅ Workflow execution completed")
+    print("   ✅ Workflow execution completed")
 
     return {
         "query": query,
