@@ -11,7 +11,7 @@ class DomainClassifierAgent(LlmAgent):
 
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         """Initialize the domain classifier agent.
 
         Args:
@@ -88,7 +88,7 @@ class QueryComplexityAgent(LlmAgent):
     Assesses query complexity for resource allocation.
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         """Initialize the complexity assessment agent.
 
         Args:

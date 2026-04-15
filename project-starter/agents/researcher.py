@@ -11,7 +11,7 @@ class ResearcherAgent(LlmAgent):
 
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         """Initialize the researcher agent.
 
         Args:
@@ -102,15 +102,15 @@ class ResearcherAgent(LlmAgent):
 class ResearchCriticAgent(LlmAgent):
     """
     Validator agent: Evaluates answer quality and provides feedback.
-
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         """Initialize the critic agent.
 
         Args:
             model: Gemini model name
         """
+
         instruction = """
             You are a research quality critic that evaluates answers.
 
@@ -130,7 +130,7 @@ class ResearchCriticAgent(LlmAgent):
             Output format (JSON):
             {
                 "quality": "excellent/good/needs_improvement/poor",
-                "quality_score": 0.85,
+                "quality_score": 0.80,
                 "feedback": "Specific feedback for improvement",
                 "strengths": ["strength1", "strength2"],
                 "weaknesses": ["weakness1", "weakness2"],
@@ -204,7 +204,7 @@ class ResearchCriticAgent(LlmAgent):
 
 
 def create_research_loop_agent(
-    model: str = "gemini-2.5-flash", max_iterations: int = 3
+    model: str = "gemini-2.5-flash-lite", max_iterations: int = 3
 ) -> LoopAgent:
     """
     Creates a LoopAgent for iterative research refinement.
@@ -229,7 +229,6 @@ def create_research_loop_agent(
     #
     # Create a LoopAgent that will run the researcher and critic iteratively.
     #
-
     refinement_loop = LoopAgent(
         name="research_refinement_loop",
         sub_agents=[researcher, critic],
@@ -243,7 +242,7 @@ async def execute_research_loop(
     client: genai.Client,
     query: str,
     max_iterations: int = 3,
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-2.5-flash-lite",
 ) -> Dict[str, Any]:
     """
     Execute iterative research refinement using ADK LoopAgent.
@@ -299,7 +298,7 @@ async def execute_research_loop(
 
         context.append({"role": "critic", "content": json.dumps(evaluation)})
 
-        quality_score = evaluation.get("quality_score", 0.5)
+        quality_score = evaluation.get("quality_score", 0.0)
         should_stop = evaluation.get("should_stop", False)
 
         print(

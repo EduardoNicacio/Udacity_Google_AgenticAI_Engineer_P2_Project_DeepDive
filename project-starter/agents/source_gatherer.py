@@ -9,7 +9,7 @@ from google.genai.types import GenerateContentConfig
 class WebSearchAgent(LlmAgent):
     """Simulates web search using LLM (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         instruction = """
             You are a web search specialist that finds relevant online sources.
 
@@ -76,7 +76,7 @@ class WebSearchAgent(LlmAgent):
 class ArxivSearchAgent(LlmAgent):
     """Simulates arXiv academic paper search using LLM (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         instruction = """
             You are an arXiv academic paper search specialist.
 
@@ -145,7 +145,7 @@ class ArxivSearchAgent(LlmAgent):
 class ScholarSearchAgent(LlmAgent):
     """Simulates Google Scholar academic search using LLM (ADK LlmAgent)."""
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         instruction = """
             You are a Google Scholar search specialist.
 
@@ -216,8 +216,9 @@ class ScholarSearchAgent(LlmAgent):
 class SourceAggregatorAgent(LlmAgent):
     """Aggregates and ranks sources from multiple search agents."""
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         """Initialize aggregator agent."""
+
         instruction = """
             You are a source aggregation specialist.
 
@@ -297,7 +298,7 @@ class SourceAggregatorAgent(LlmAgent):
 
 
 def create_source_gathering_workflow(
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-2.5-flash-lite",
 ) -> SequentialAgent:
     """
     Creates a SequentialAgent with ParallelAgent for source gathering.
@@ -319,8 +320,8 @@ def create_source_gathering_workflow(
     # Create a ParallelAgent that runs all three search agents concurrently.
     # This is the "fan-out" part of the fan-out/fan-in pattern.
 
-    parallel_searches = ParallelAgent(
-        name="parallel_searches",
+    parallel_source_searches = ParallelAgent(
+        name="parallel_source_searches",
         sub_agents=[web_search, arxiv_search, scholar_search],
     )
 
@@ -332,14 +333,14 @@ def create_source_gathering_workflow(
 
     source_gathering_workflow = SequentialAgent(
         name="source_gathering_workflow",
-        sub_agents=[parallel_searches, aggregator],
+        sub_agents=[parallel_source_searches, aggregator],
     )
 
     return source_gathering_workflow
 
 
 async def execute_source_gathering(
-    client: genai.Client, query: str, model: str = "gemini-2.5-flash"
+    client: genai.Client, query: str, model: str = "gemini-2.5-flash-lite"
 ) -> Dict[str, Any]:
     """
     Execute parallel source gathering workflow using ADK ParallelAgent + SequentialAgent.

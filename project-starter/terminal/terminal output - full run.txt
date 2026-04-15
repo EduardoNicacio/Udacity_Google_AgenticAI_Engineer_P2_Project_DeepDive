@@ -9,30 +9,31 @@ AI RESEARCH ASSISTANT
  Configuration:
    Project ID: a4701101-u4773083-1774319820
    Location: us-central1
-   Model: gemini-2.5-flash
+   Model: gemini-2.5-flash-lite
 
 🔧 Initializing genai.Client...
    Using Vertex AI authentication...
    ✓ Client initialized with Vertex AI
 
 📝 Sample Research Queries:
-   1. What are the latest advances in quantum computing error correction?
-   2. How does machine learning improve code review efficiency?
-   3. What are the health impacts of microplastics in marine ecosystems?
-   4. What are the latest types of computer memory?
+   1. Tell me about the history of the Python programming language, including evidences.
+   2. What are the health impacts of microplastics in marine ecosystems?
+   3. What are the latest advances in quantum computing error correction?
+   4. How does machine learning improve code review efficiency?
+   5. What are the latest types of computer memory?
 
 💡 To research a different topic:
    • Edit queries list in main.py
    • Or set RESEARCH_QUERY environment variable
    • Example: export RESEARCH_QUERY='Your custom question here'
 
-🎯 Running research workflow for query 1...
+🎯 Running custom research query...
 
 ================================================================================
 AI RESEARCH ASSISTANT - EXECUTION
 ================================================================================
 
- Research Query: What are the latest advances in quantum computing error correction?
+ Research Query: Please tell me what you do know, including evidences, about the history of the Python programming language.
 
    Pattern: SequentialAgent
 
@@ -45,19 +46,19 @@ STAGE 1: Domain Classification
 --------------------------------------------------------------------------------
    ✓ Domain: computer_science
    ✓ Confidence: 0.98
-   ✓ Complexity: high
-   ✓ Recommended sources: arxiv, scholar, web, journals
+   ✓ Complexity: low
+   ✓ Recommended sources: web, scholar, wikipedia
 
 --------------------------------------------------------------------------------
 STAGE 2: Source Gathering
 --------------------------------------------------------------------------------
 
- Source Gathering: What are the latest advances in quantum computing error corr...
+ Source Gathering: Please tell me what you do know, including evidences, about ...
    Pattern: ADK ParallelAgent + SequentialAgent
    Created SequentialAgent: source_gathering_workflow
    Type: SequentialAgent
    Sub-agents: 2
-   Stage 1 (ParallelAgent): parallel_searches
+   Stage 1 (ParallelAgent): parallel_source_searches
       → Type: ParallelAgent
       → Sub-agents: 3 parallel searches
    Stage 2 (Aggregator): source_aggregator
@@ -66,24 +67,24 @@ STAGE 2: Source Gathering
 
    Stage 1: ParallelAgent (fan-out)
       → web_search running...
-      ✓ web_search: Found 0 sources
+      ✓ web_search: Found 8 sources
       → arxiv_search running...
-      ✓ arxiv_search: Found 0 sources
+      ✓ arxiv_search: Found 5 sources
       → scholar_search running...
-      ✓ scholar_search: Found 0 sources
+      ✓ scholar_search: Found 7 sources
 
    Stage 2: Aggregator (fan-in)
       → source_aggregator aggregating results...
-      ✓ Total: 0 sources
-      ✓ Unique: 0 sources
-      ✓ Top sources: 0
+      ✓ Total: 20 sources
+      ✓ Unique: 20 sources
+      ✓ Top sources: 15
    ✅ Workflow execution completed
 
 --------------------------------------------------------------------------------
 STAGE 3: Research Refinement
 --------------------------------------------------------------------------------
 
- Research Loop: What are the latest advances in quantum computing error corr...
+ Research Loop: Please tell me what you do know, including evidences, about ...
    Max Iterations: 3
    Created LoopAgent: research_refinement_loop
    Type: LoopAgent
@@ -93,35 +94,25 @@ STAGE 3: Research Refinement
 
    Iteration 1/3
       → researcher generating answer...
-      ✓ Answer generated (confidence: high)
+      ✓ Answer generated (confidence: low)
       → critic evaluating quality...
-      ✓ Quality: needs_improvement (score: 0.50)
+      ✓ Quality: poor (score: 0.20)
       Quality below threshold - Continue refining...
-      Feedback: Unable to parse evaluation...
+      Feedback: The answer is extremely repetitive and lacks any substantive information about t...
 
    Iteration 2/3
       → researcher generating answer...
       ✓ Answer generated (confidence: high)
       → critic evaluating quality...
-      ✓ Quality: needs_improvement (score: 0.50)
-      Quality below threshold - Continue refining...
-      Feedback: Unable to parse evaluation...
-
-   Iteration 3/3
-      → researcher generating answer...
-      ✓ Answer generated (confidence: high)
-      → critic evaluating quality...
-      ✓ Quality: needs_improvement (score: 0.50)
-      Quality below threshold - Continue refining...
-
-   Max iterations reached - Returning best attempt
-   LoopAgent execution completed (3 iterations)
+      ✓ Quality: excellent (score: 0.95)
+      Quality threshold met - Loop terminated
+   LoopAgent execution completed (2 iterations)
 
 --------------------------------------------------------------------------------
 STAGE 4: Fact Checking (LlmAgent)
 --------------------------------------------------------------------------------
-   ✓ Credibility Score: 0.50
-   ✓ Verified Claims: 0
+   ✓ Credibility Score: 1.00
+   ✓ Verified Claims: 8
    ✓ Questionable Claims: 0
 
 --------------------------------------------------------------------------------
@@ -129,14 +120,14 @@ STAGE 5: Synthesis (LlmAgent)
 --------------------------------------------------------------------------------
    ✓ Synthesis completed
    ✓ Key Insights: 5
-   ✓ Themes: 0
-   ✓ Coherence Score: 0.50
+   ✓ Themes: 2
+   ✓ Coherence Score: 0.95
 
 --------------------------------------------------------------------------------
 STAGE 6: Citation Generation (LlmAgent)
 --------------------------------------------------------------------------------
    ✓ Citations formatted
-   ✓ Total Citations: 0
+   ✓ Total Citations: 10
    ✓ Style: APA
 
 ================================================================================
@@ -145,12 +136,12 @@ WORKFLOW COMPLETED
 
   All 7 stages executed successfully
   Results Summary:
-   • Query: What are the latest advances in quantum computing error correction?
+   • Query: Please tell me what you do know, including evidences, about the history of the Python programming language.
    • Domain: computer_science
-   • Sources Found: 0
-   • Research Iterations: 3
-   • Credibility Score: 0.50
-   • Citations: 0
+   • Sources Found: 20
+   • Research Iterations: 2
+   • Credibility Score: 1.00
+   • Citations: 10
   Execution Method:
    ✓ All agents inherit from ADK base classes
    ✓ Executed via agent.run_async() with genai.Client
@@ -160,14 +151,10 @@ WORKFLOW COMPLETED
 --------------------------------------------------------------------------------
 STAGE 7: Performance Evaluation
 --------------------------------------------------------------------------------
-   ✓ Execution Time: 117.31s
-   ✓ Performance Score: 0.50
-   ✓ Health Status: needs_improvement
+   ✓ Execution Time: 40.64s
+   ✓ Performance Score: 1.00
+   ✓ Health Status: excellent
    ✓ Queries Processed: 1
-   ⚠️  Bottlenecks Identified:
-      • Low quality scores - consider adjusting prompts or increasing iterations
-      • Slow response times - optimize source gathering
-      • Insufficient sources - expand search strategies
 
 📄 Generating research report...
    ✓ Report saved to: C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter\docs/research_report.md
@@ -176,31 +163,40 @@ STAGE 7: Performance Evaluation
 RESEARCH REPORT PREVIEW
 ================================================================================
 
-        # Research Report: What are the latest advances in quantum computing error correction?
+        # Research Report: Please tell me what you do know, including evidences, about the history of the Python programming language.
 
         ## Executive Summary
-        Synthesis failed
+
+        Python was conceived in the late 1980s by Guido van Rossum as a readable, high-level language, with its first public release in 1991 featuring core programming elements. Its design philosophy prioritizing programmer productivity and code readability, inspired in part by "Monty Python's Flying Circus", has driven its widespread adoption across diverse technological fields.
+
 
         **Domain:** computer_science
-        **Credibility Score:** 0.50/1.00
-        **Sources Consulted:** 0
-        **Research Iterations:** 3
+        **Credibility Score:** 1.00/1.00
+        **Credibility Score:** 1.00/1.00
+        **Sources Consulted:** 20
+        **Sources Consulted:** 20
+        **Research Iterations:** 2
+        **Research Iterations:** 2
+
 
         ---
 
         ## Research Findings
-
-        Quantum computing error correction (QEC) is a critical field focused on mitigating the effects of noise and decoherence, which are inherent challenges in building stable quantum computers. Recent advances are pushing the boundaries of what's possible, moving from theoretical concepts to experimental demonstrations of logical qubits that outperform their physical counterparts. The primary goal is to achieve fault-tolerant quantum computation, where errors can be corrected faster than they accumulate, enabling reliable execution of complex quantum algorithms.
-
-One of the most significant breakthroughs involves the experimental realization and improved performance of logical qubits. Researchers are now able to encode quantum information across multiple physical qubits, creating a 'logical qubit' that is more robust against errors. For instance, recent experiments have shown logical qubits with longer coherence times and lower error rates than their constituent physical qubits, a crucial step towards demonstrating 'break-even' or 'net error suppression'. This involves not just detecting errors but actively correcting them in real-time, often using sophisticated decoding algorithms. The development of these algorithms, which can quickly and efficiently identify and correct errors, is equally vital. Furthermore, novel quantum error correcting codes are being explored beyond the well-established surface codes, aiming for higher error thresholds and more efficient resource utilization.
-
         ---
 
-        ## Key Insights
+        ## Research Findings
 
-        1. **Experimental Demonstrations of Logical Qubits Outperforming Physical Qubits:** Recent experimen
+        ## Research Findings
+        ## Research Findings
 
-... (report continues, total 6396 characters)
+        The Python programming language originated in the late 1980s, conceived by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands. Its development was a deliberate effort to create a successor to the ABC language, with a primary goal of establishing an interpreted, high-level, general-purpose programming language that prioritized code readability through its distinctive use of significant
+
+        The Python programming language originated in the late 1980s, conceived by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands. Its development was a deliberate effort to create a successor to the ABC language, with a primary goal of establishing an interpreted, high-level, general-purpose programming language that prioritized code readability through its distinctive use of significant        The Python programming language originated in the late 1980s, conceived by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands. Its development was a deliberate effort to create a successor to the ABC language, with a primary goal of establishing an interpreted, high-level, general-purpose programming language that prioritized code readability through its distinctive use of significanta successor to the ABC language, with a primary goal of establishing an interpreted, high-level, general-purpose programming language that prioritized code readability through its distinctive use of significant indentation. Van Rossum's motivation stemmed from a desire for a language that was both accessible for beginners and capable of handling sophisticated tasks. The name "Python" itself is a nod to Van Rossum's appreciation for the British comedy troupe "Monty Python's Flying Circus".
+
+
+The initial public release of Python, version 0.9.0, took place in February 1991. This foundational version already incorporated essential programming constructs such as classes with inheritance capabilities, robust exception handling mechanisms, and fundamental data types including lists, dictionaries, and strings. The core design philosophy of Python has consistently revolved around enhancing programmer productivity and ensuring code readability. This deliberate focus has been instrumental in its broad appeal and adoption across a divers
+
+... (report continues, total 6362 characters)
 
 Full report saved to: C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter\docs/research_report.md
 
@@ -210,10 +206,10 @@ EXECUTION SUMMARY
 
   Workflow Metrics:
    • Total Stages: 6
-   • Research Iterations: 3
-   • Sources Found: 0
-   • Credibility Score: 0.50
-   • Citations: 0
+   • Research Iterations: 2
+   • Sources Found: 20
+   • Credibility Score: 1.00
+   • Citations: 10
 
  Execution successful!
-(venv) PS C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter> 
+(venv) PS C:\udacity\Google_AgenticAI_Engineer\Udacity_Google_AgenticAI_Engineer_P2_Project_DeepDive\project-starter>

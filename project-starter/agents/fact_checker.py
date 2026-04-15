@@ -18,7 +18,7 @@ class FactCheckAgent(LlmAgent):
     Pattern: LlmAgent for validation tasks
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = "gemini-2.5-flash-lite"):
         """Initialize the fact check agent.
 
         Args:

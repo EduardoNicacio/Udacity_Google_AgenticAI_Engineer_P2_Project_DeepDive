@@ -11,12 +11,14 @@ from agents.other_agents import (
 )
 from agents.evaluator import PerformanceEvaluator
 
+# Create a shared instance (singleton pattern)
+evaluator = PerformanceEvaluator()  # Single instance per process
 
 async def execute_research_workflow(
     client: genai.Client,
     query: str,
-    max_iterations: int = 3,
-    model: str = "gemini-2.5-flash",
+    max_iterations: int = 5,
+    model: str = "gemini-2.5-flash-lite",
 ) -> Dict[str, Any]:
     """
     Execute complete research assistant workflow.
@@ -85,6 +87,9 @@ async def execute_research_workflow(
 
     sources = await execute_source_gathering(client=client, query=query, model=model)
     workflow_results["stage_2_sources"] = sources # type: ignore
+    
+    # DEBUG:
+    # print(f"Sources found: {sources}")  # Debug this output
 
     # ========================================================================
     # STAGE 3: Research Refinement
@@ -115,6 +120,9 @@ async def execute_research_workflow(
     print(f"   ✓ Questionable Claims: {len(fact_check.get('questionable_claims', []))}")
 
     workflow_results["stage_4_fact_check"] = fact_check # type: ignore
+    
+    # DEBUG:
+    # print(f"Fact check returned: {fact_check}")
 
     # ========================================================================
     # STAGE 5: Synthesis (LlmAgent)
@@ -200,12 +208,12 @@ async def execute_research_workflow(
     execution_time = time.time() - start_time
  
     # Step 2: Instantiate the evaluator
-    evaluator = PerformanceEvaluator()
+    # initialized at line 15 (Singleton)
  
     # Step 3: Record all observable metrics from the completed workflow stages
     evaluator.evaluate_query_result(
         result={
-            "quality_score": fact_check.get("credibility_score", 0), # Using credibility as quality proxy
+            "quality_score": fact_check.get("credibility_score", 0.5),
             "sources_found": sources["aggregated_sources"].get("total_sources", 0),
             "iterations": research["iterations_run"], 
             "fact_checks": len(fact_check.get("verified_claims", [])) + len(fact_check.get("questionable_claims", [])), # Total claims checked
@@ -213,6 +221,9 @@ async def execute_research_workflow(
         },
         processing_time=execution_time
     )
+    
+    # DEBUG:
+    # print(f"Recording metrics: quality={fact_check.get('credibility_score', 0)}, sources={sources['aggregated_sources'].get('total_sources', 0)}")
  
     # Step 4: Retrieve the aggregated summary with scores, health status, and bottlenecks
     performance_summary = evaluator.analyze_performance()
@@ -334,9 +345,9 @@ def generate_research_report(workflow_results: Dict[str, Any]) -> str:
 
         This research report was generated using an ADK-based multi-agent system with the following workflow:
 
-        1. **Domain Classification** 
-        2. **Parallel Source Gathering** 
-        3. **Iterative Research Refinement** 
+        1. **Domain Classification**
+        2. **Parallel Source Gathering**
+        3. **Iterative Research Refinement**
         4. **Fact Checking** (LlmAgent validation)
         5. **Synthesis** (LlmAgent integration)
         6. **Citation Formatting** (LlmAgent academic standards)
